@@ -13,7 +13,7 @@ import SwiftUI
 struct FieldLabel: View {
     let title     : String
     var fontSize  : CGFloat     = 13
-    var fontWeight: Font.Weight = .medium
+    var fontWeight: Font.Weight = .regular
     var textColor : Color       = .white
     var botPadding: CGFloat     = 8
     
@@ -25,6 +25,7 @@ struct FieldLabel: View {
             .padding(.bottom, botPadding)
     }
 }
+
 
 // MARK: - Input Field
 // Standard text input field
@@ -56,6 +57,7 @@ struct InputField: View {
     }
 }
 
+
 // MARK: - Secure Input Field
 // Password input field — hides characters
 // Used in: LoginView password, RegisterView password
@@ -84,6 +86,7 @@ struct SecureInputField: View {
     }
 }
 
+
 // MARK: - OR Divider
 // Horizontal line with "or" text in middle
 // Used in: LoginView, RegisterView
@@ -109,6 +112,11 @@ struct ORDivider: View {
     }
 }
 
+
+
+
+
+// Preview
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()

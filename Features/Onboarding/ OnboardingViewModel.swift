@@ -11,6 +11,6 @@ import Combine
 
 final class OnboardingViewModel: ObservableObject {
    
-    @Published var  slides = OnboardingData.slides
+    @Published var slides = OnboardingData.slides
 }
 

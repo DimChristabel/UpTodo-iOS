@@ -80,9 +80,3 @@ struct FingerprintView: View {
     FingerprintView()
 }
 
-
-
-
-
-
-

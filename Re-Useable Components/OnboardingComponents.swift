@@ -40,6 +40,7 @@ struct OnboardingDots: View {
     }
 }
 
+
 // MARK: - Onboarding Slide Title
 // Large bold title on each slide
 // Used in: OnboardingView
@@ -64,6 +65,7 @@ struct OnboardingTitle: View {
     }
 }
 
+
 // MARK: - Onboarding Subtitle
 // Smaller grey body text on each slide
 // Used in: OnboardingView
@@ -87,6 +89,10 @@ struct OnboardingSubtitle: View {
             .padding(.bottom, botPadding)
     }
 }
+
+
+
+// Preview
 
 #Preview {
     ZStack {

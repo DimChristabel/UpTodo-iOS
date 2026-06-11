@@ -41,6 +41,7 @@ struct HomeSearchBar: View {
     }
 }
 
+
 // MARK: - Today Chip
 // Filter chip that toggles today/all tasks
 // Used in: HomeView
@@ -75,6 +76,7 @@ struct TodayFilterChip: View {
     }
 }
 
+
 // MARK: - Completed Section Chip
 // Purple chip showing "Completed" label
 // Used in: HomeView task list
@@ -107,72 +109,76 @@ struct CompletedChip: View {
     }
 }
 
+
 // MARK: - Task Row
 // Single task item in the list
 // Used in: HomeView, CalendarView
-struct TaskRowView: View {
-    let task    : TaskItem
-    let onToggle: () -> Void
-    
-    // ── Change row properties here ──
-    var checkboxSize    : CGFloat = 22
-    var checkboxBorder  : CGFloat = 1.5
-    var titleFontSize   : CGFloat = 14
-    var timeFontSize    : CGFloat = 11
-    var rowBgColor      : Color   = Color.white.opacity(0.04)
-    var rowCornerRadius : CGFloat = 8
-    var rowHorizPad     : CGFloat = 16
-    var rowVertPad      : CGFloat = 14
-    var rowSpacing      : CGFloat = 3
-    var activeColor     : Color   = Color("PurpleColor")
-    
-    var body: some View {
-        HStack(spacing: 14) {
-            
-            // ── Checkbox ──
-            Button(action: onToggle) {
-                ZStack {
-                    Circle()
-                        .strokeBorder(
-                            task.isCompleted
-                            ? activeColor
-                            : Color.gray.opacity(0.6),
-                            lineWidth: checkboxBorder)
-                        .frame(width: checkboxSize,
-                               height: checkboxSize)
-                    if task.isCompleted {
-                        Circle()
-                            .fill(activeColor)
-                            .frame(width: checkboxSize * 0.55,
-                                   height: checkboxSize * 0.55)
-                    }
-                }
-            }
-            
-            // ── Task info ──
-            VStack(alignment: .leading, spacing: 3) {
-                Text(task.title)
-                    .font(.system(size: titleFontSize,
-                                  weight: .medium))
-                    .foregroundColor(task.isCompleted
-                                     ? .gray : .white)
-                    .strikethrough(task.isCompleted,
-                                   color: .gray)
-                Text("Today At \(task.dueTime)")
-                    .font(.system(size: timeFontSize))
-                    .foregroundColor(.gray)
-            }
-            Spacer()
-        }
-        .padding(.horizontal, rowHorizPad)
-        .padding(.vertical, rowVertPad)
-        .background(rowBgColor)
-        .cornerRadius(rowCornerRadius)
-        .padding(.horizontal, rowHorizPad)
-        .padding(.vertical, rowSpacing)
-    }
-}
+//struct TaskRowView: View {
+//    let task    : TaskItem
+//    let onToggle: () -> Void
+//    
+//    // ── Change row properties here ──
+//    var checkboxSize    : CGFloat = 22
+//    var checkboxBorder  : CGFloat = 1.5
+//    var titleFontSize   : CGFloat = 14
+//    var timeFontSize    : CGFloat = 11
+//    var rowBgColor      : Color   = Color.white.opacity(0.04)
+//    var rowCornerRadius : CGFloat = 8
+//    var rowHorizPad     : CGFloat = 16
+//    var rowVertPad      : CGFloat = 14
+//    var rowSpacing      : CGFloat = 3
+//    var activeColor     : Color   = Color("PurpleColor")
+//    
+//    var body: some View {
+//        HStack(spacing: 14) {
+//            
+//            // ── Checkbox ──
+//            Button(action: onToggle) {
+//                ZStack {
+//                    Circle()
+//                        .strokeBorder(
+//                            task.isCompleted
+//                            ? activeColor
+//                            : Color.gray.opacity(0.6),
+//                            lineWidth: checkboxBorder)
+//                        .frame(width: checkboxSize,
+//                               height: checkboxSize)
+//                    if task.isCompleted {
+//                        Circle()
+//                            .fill(activeColor)
+//                            .frame(width: checkboxSize * 0.55,
+//                                   height: checkboxSize * 0.55)
+//                    }
+//                }
+//            }
+//            
+//            // ── Task info ──
+//            VStack(alignment: .leading, spacing: 3) {
+//                Text(task.title)
+//                    .font(.system(size: titleFontSize,
+//                                  weight: .medium))
+//                    .foregroundColor(task.isCompleted
+//                                     ? .gray : .white)
+//                    .strikethrough(task.isCompleted,
+//                                   color: .gray)
+//                Text("Today At \(task.dueTime)")
+//                    .font(.system(size: timeFontSize))
+//                    .foregroundColor(.gray)
+//            }
+//            Spacer()
+//        }
+//        .padding(.horizontal, rowHorizPad)
+//        .padding(.vertical, rowVertPad)
+//        .background(rowBgColor)
+//        .cornerRadius(rowCornerRadius)
+//        .padding(.horizontal, rowHorizPad)
+//        .padding(.vertical, rowSpacing)
+//    }
+//}
+//
 
+
+// Preview
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()
@@ -183,17 +189,17 @@ struct TaskRowView: View {
                 .padding(.horizontal, 16)
             CompletedChip()
                 .padding(.horizontal, 16)
-            TaskRowView(
-                task: TaskItem(
-                    id: UUID().uuidString,
-                    title: "Do Math Homework",
-                    description: "",
-                    dueDate: Date(),
-                    dueTime: "16:45",
-                    isCompleted: false,
-                    createdAt: Date()
-                )
-            ) { }
+//            TaskRowView(
+//                task: TaskItem(
+//                    id: UUID().uuidString,
+//                    title: "Do Math Homework",
+//                    description: "",
+//                    dueDate: Date(),
+//                    dueTime: "16:45",
+//                    isCompleted: false,
+//                    createdAt: Date()
+                //)
+          //  ) { }
         }
     }
 }

@@ -5,6 +5,7 @@
 //  Created by Maxut Consulting on 09/06/2026.
 //
 
+
 import SwiftUI
 
 // MARK: - CalendarView
@@ -152,14 +153,10 @@ struct CalendarTaskRow: View {
     }
 }
 
+// MARK: - Preview
 #Preview {
     CalendarView()
 }
-
-
-
-
-
 
 
 

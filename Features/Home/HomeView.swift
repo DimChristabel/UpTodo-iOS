@@ -203,7 +203,6 @@ struct TaskRowView: View {
     }
 }
 
-
 // MARK: - Preview
 #Preview {
     HomeView()

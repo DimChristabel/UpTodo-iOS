@@ -5,6 +5,7 @@
 //  Created by Maxut Consulting on 31/05/2026.
 //
 
+
 import SwiftUI
 
 struct LoginView: View {
@@ -127,3 +128,4 @@ struct LoginView: View {
         LoginView()
     }
 }
+

@@ -33,8 +33,7 @@ struct ProfileView: View {
                         
                         // ── Title ──
                         Text("Profile")
-                            .font(.system(size: 18,
-                                          weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.top, 20)
                             .padding(.bottom, 24)
@@ -49,8 +48,7 @@ struct ProfileView: View {
                         
                         // ── Name ──
                         Text(userName)
-                            .font(.system(size: 18,
-                                          weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.white)
                             .padding(.bottom, 20)
                         
@@ -135,8 +133,7 @@ struct ProfileView: View {
                               blue: 0.15))
             }
             .sheet(isPresented: $showChangePassword) {
-                ChangePasswordSheet(
-                    isPresented: $showChangePassword)
+                ChangePasswordSheet(isPresented: $showChangePassword)
                     .presentationDetents([.height(320)])
                     .presentationCornerRadius(16)
                     .presentationBackground(
@@ -161,6 +158,13 @@ struct ProfileView: View {
         }
     }
 }
+
+// MARK: - Dummy Subviews (For Preview Compilation Safety)
+// These keep your project compiling if the individual sheet files aren't in your target scope yet.
+//struct ChangeNameSheet: View { @Binding var isPresented: Bool; var body: some View { Text("Change Name").foregroundColor(.white) } }
+//struct ChangePasswordSheet: View { @Binding var isPresented: Bool; var body: some View { Text("Change Password").foregroundColor(.white) } }
+//struct ChangeImageSheet: View { @Binding var isPresented: Bool; var body: some View { Text("Change Image").foregroundColor(.white) } }
+//struct SettingsView: View { var body: some View { Text("Settings Screen").foregroundColor(.white).frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.black) } }
 
 // MARK: - Preview
 #Preview {

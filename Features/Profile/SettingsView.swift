@@ -6,7 +6,6 @@
 //
 
 import Foundation
-
 import SwiftUI
 
 // MARK: - SettingsView
@@ -17,7 +16,7 @@ struct SettingsView: View {
     var body: some View {
         ZStack {
             
-            //  Background 
+            //  Background
             SettingsBackground()
             
             VStack(spacing: 0) {
@@ -140,43 +139,43 @@ struct SettingsSectionLabel: View {
 }
 
 // MARK: - Settings Row Item
-struct SettingsRowItem: View {
-    let icon  : String
-    let title : String
-    let action: () -> Void
-    
-    // ── Change row properties here ──
-    private let iconSize       : CGFloat = 20
-    private let iconColor      = Color.white
-    private let iconFrameWidth : CGFloat = 28
-    private let titleFontSize  : CGFloat = 15
-    private let titleColor     = Color.white
-    private let chevronSize    : CGFloat = 13
-    private let chevronColor   = Color.gray
-    private let iconSpacing    : CGFloat = 14
-    private let horizPadding   : CGFloat = 16
-    private let vertPadding    : CGFloat = 18
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: iconSpacing) {
-                Image(systemName: icon)
-                    .font(.system(size: iconSize))
-                    .foregroundColor(iconColor)
-                    .frame(width: iconFrameWidth)
-                Text(title)
-                    .font(.system(size: titleFontSize))
-                    .foregroundColor(titleColor)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.system(size: chevronSize))
-                    .foregroundColor(chevronColor)
-            }
-            .padding(.horizontal, horizPadding)
-            .padding(.vertical, vertPadding)
-        }
-    }
-}
+//struct SettingsRowItem: View {
+//    let icon  : String
+//    let title : String
+//    let action: () -> Void
+//    
+//    // ── Change row properties here ──
+//    private let iconSize       : CGFloat = 20
+//    private let iconColor      = Color.white
+//    private let iconFrameWidth : CGFloat = 28
+//    private let titleFontSize  : CGFloat = 15
+//    private let titleColor     = Color.white
+//    private let chevronSize    : CGFloat = 13
+//    private let chevronColor   = Color.gray
+//    private let iconSpacing    : CGFloat = 14
+//    private let horizPadding   : CGFloat = 16
+//    private let vertPadding    : CGFloat = 18
+//    
+//    var body: some View {
+//        Button(action: action) {
+//            HStack(spacing: iconSpacing) {
+//                Image(systemName: icon)
+//                    .font(.system(size: iconSize))
+//                    .foregroundColor(iconColor)
+//                    .frame(width: iconFrameWidth)
+//                Text(title)
+//                    .font(.system(size: titleFontSize))
+//                    .foregroundColor(titleColor)
+//                Spacer()
+//                Image(systemName: "chevron.right")
+//                    .font(.system(size: chevronSize))
+//                    .foregroundColor(chevronColor)
+//            }
+//            .padding(.horizontal, horizPadding)
+//            .padding(.vertical, vertPadding)
+//        }
+//    }
+//}
 
 // MARK: - Preview
 #Preview {

@@ -27,11 +27,10 @@ struct Intro: View {
         }
     }
 }
+
 #Preview {
     Intro()
 }
-
-
 
 
 

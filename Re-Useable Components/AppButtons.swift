@@ -34,6 +34,7 @@ struct PrimaryButton: View {
     }
 }
 
+
 // MARK: - Outline Button
 // Used in: StartView Create Account button
 struct OutlineButton: View {
@@ -65,13 +66,14 @@ struct OutlineButton: View {
     }
 }
 
+
 // MARK: - Text Button
 // Plain text no background
 // Used in: SKIP, BACK, Forgot Password
 struct TextButton: View {
     let title     : String
     var fontSize  : CGFloat     = 14
-    var fontWeight: Font.Weight = .medium
+    var fontWeight: Font.Weight = .regular
     var textColor : Color       = .white
     let action    : () -> Void
     
@@ -84,6 +86,7 @@ struct TextButton: View {
         }
     }
 }
+
 
 // MARK: - Icon Button
 // Icon only no text
@@ -108,6 +111,7 @@ struct IconButton: View {
     }
 }
 
+
 // MARK: - FAB Button
 // Floating purple + button
 // Used in: HomeView, MainTabView
@@ -116,9 +120,7 @@ struct FABButton: View {
     var iconSize  : CGFloat     = 22
     var iconWeight: Font.Weight = .bold
     var iconColor : Color       = .white
-    var bgColor   : Color       = Color(red: 0.53,
-                                        green: 0.46,
-                                        blue: 1.0)
+    var bgColor   : Color       = Color("MildPurple")
     var size      : CGFloat     = 52
     let action    : () -> Void
     
@@ -135,6 +137,7 @@ struct FABButton: View {
     }
 }
 
+
 // MARK: - Sheet Action Button
 // Used inside bottom sheets
 // Used in: ChangeNameSheet, ChangePasswordSheet
@@ -143,9 +146,7 @@ struct SheetActionButton: View {
     var fontSize    : CGFloat     = 15
     var fontWeight  : Font.Weight = .bold
     var textColor   : Color       = .white
-    var bgColor     : Color       = Color(red: 0.53,
-                                          green: 0.46,
-                                          blue: 1.0)
+    var bgColor     : Color       = Color("MildPurple")
     var cornerRadius: CGFloat     = 4
     var vertPadding : CGFloat     = 14
     let action      : () -> Void
@@ -163,6 +164,7 @@ struct SheetActionButton: View {
         }
     }
 }
+
 
 // MARK: - Social Auth Button
 // Icon + text button
@@ -214,6 +216,9 @@ struct SocialAuthButton: View {
     }
 }
 
+
+
+//Previews
 #Preview {
     ZStack {
         Color.black.ignoresSafeArea()

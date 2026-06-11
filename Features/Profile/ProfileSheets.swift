@@ -6,7 +6,6 @@
 //
 
 import Foundation
-
 import SwiftUI
 
 // MARK: - Change Name Sheet
@@ -227,7 +226,7 @@ struct ChangeImageSheet: View {
     
     // ── Change option properties here ──
     private let optionFontSize  : CGFloat = 15
-    private let optionColor     = Color.white
+    private let optionColor      = Color.white
     private let optionHorizPad  : CGFloat = 24
     private let optionVertPad   : CGFloat = 16
     
@@ -298,10 +297,3 @@ struct ImageOption: View {
         }
     }
 }
-
-
-
-
-
-
-

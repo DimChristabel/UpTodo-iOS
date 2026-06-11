@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 struct OnboardingData {
     
     static let slides: [OnboardingSlide] = [

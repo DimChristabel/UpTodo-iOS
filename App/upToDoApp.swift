@@ -52,8 +52,6 @@
 //
 //
 
-
-
 import SwiftUI
 import Firebase
 
@@ -80,7 +78,7 @@ struct upToDoApp: App {
                         }
                     }
             } else {
-                // TEMPORARY — go straight to HomeView for testing
+                // TEMPORARY — go straight to MainTabView for testing
                 // TODO: put back auth flow when Firebase is connected
                 NavigationStack {
                     MainTabView()
@@ -99,9 +97,22 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     }
 }
 
-
-
-
-
+// MARK: - Temporary Mock View (For Preview & Compilation Safety)
+// If Intro screen is not yet declared in your other files, this keeps the build safe.
+//struct Intro: View {
+//    var body: some View {
+//        ZStack {
+//            Color.black.ignoresSafeArea()
+//            VStack(spacing: 16) {
+//                Image(systemName: "checkmark.circle.fill")
+//                    .font(.system(size: 64))
+//                    .foregroundColor(Color(red: 0.53, green: 0.46, blue: 1.0))
+//                Text("UpTodo")
+//                    .font(.system(size: 32, weight: .bold))
+//                    .foregroundColor(.white)
+//            }
+//        }
+//    }
+//}
 
 

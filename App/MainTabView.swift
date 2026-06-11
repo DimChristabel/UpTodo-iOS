@@ -13,7 +13,6 @@ import SwiftUI
 struct MainTabView: View {
     
     //  Tracks which tab is currently selected
-   
     @State private var selectedTab = 0
     
     //  Controls Add Task sheet from + button
@@ -167,21 +166,6 @@ struct TabBarItem: View {
 #Preview {
     MainTabView()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
