@@ -5,34 +5,44 @@
 //  Created by Maxut Consulting on 26/05/2026.
 //
 
-
 import SwiftUI
 
-struct Intro: View {
+// MARK: - IntroView
+
+/// Displays the application's splash screen.
+///
+/// This view serves as the initial entry point
+/// of the application and presents the UpTodo
+/// branding before transitioning to the
+/// onboarding experience.
+struct IntroView: View {
+
+    // MARK: Body
+
     var body: some View {
+
         ZStack {
+
             Color.black
                 .ignoresSafeArea()
 
-            VStack {
-                Spacer()
+            // MARK: Application Logo
 
-                Image("appLogo")
-                    .resizable()
-                    .frame(width: 140, height: 180)
-
-                Spacer()
-            }
-            .frame(maxHeight: .infinity)
+            Image("appLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(
+                    width: 120,
+                    height: 120
+                )
         }
     }
 }
 
+// MARK: - Preview
+
 #Preview {
-    Intro()
+
+    IntroView()
+        .preferredColorScheme(.dark)
 }
-
-
-
-
-

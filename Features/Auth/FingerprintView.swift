@@ -8,75 +8,119 @@
 import SwiftUI
 
 // MARK: - FingerprintView
+
+/// Provides biometric authentication using
+/// Touch ID or device-supported fingerprint
+/// verification.
+///
+/// Users can authenticate using biometrics
+/// before accessing the main application or
+/// choose to return to the previous screen.
 struct FingerprintView: View {
 
-    // false = waiting
-    // true = failed
-    @State private var isFailed = false
+    // MARK: Properties
 
-    @Environment(\.dismiss) private var dismiss
+    @ObservedObject
+    var viewModel: AuthViewModel
+
+    /// Called when biometric authentication
+    /// completes successfully.
+    let onAuthenticationPassed: () -> Void
+
+    /// Called when the user cancels the
+    /// authentication process.
+    let onCancelDismiss: () -> Void
+
+    // MARK: Body
 
     var body: some View {
+
         ZStack {
-            Color.black.ignoresSafeArea()
+
+            Color.black
+                .ignoresSafeArea()
 
             VStack {
 
                 Spacer()
 
-                // Fingerprint Icon
-                Image(systemName: "touchid")
-                    .font(.system(size: 80))
-                    .foregroundColor(
-                        isFailed ? .red : .white
-                    )
-                    .padding(.bottom, 32)
+                // MARK: Screen Title
 
-                // Message
-                Text(
-                    isFailed
-                    ? "Your fingerprint is not matched. Please try again later!!!"
-                    : "Please hold your finger at the fingerprint scanner to verify your identity"
-                )
-                .font(.system(size: 20))
-                .foregroundColor(
-                    isFailed ? .red : .white
-                )
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 30)
+                Text("Fingerprint")
+                    .font(
+                        .system(
+                            size: 32,
+                            weight: .bold
+                        )
+                    )
+                    .foregroundColor(.white)
 
                 Spacer()
 
-                // Bottom Buttons
-                HStack(spacing: 12) {
+                // MARK: Biometric Authentication
 
-                    TextButton(
-                        title: "Cancel",
-                        fontSize: 15,
-                        fontWeight: .regular
-                    ) {
-                        dismiss()
-                    }
-                    .frame(maxWidth: .infinity)
+                Button {
 
-                    PrimaryButton(
-                        title: "Use Password",
-                        fontSize: 15,
-                        fontWeight: .regular
-                    ) {
-                        dismiss()
+                    viewModel.verifyFingerprint {
+
+                        onAuthenticationPassed()
                     }
-                    .frame(maxWidth: .infinity)
+
+                } label: {
+
+                    Image(systemName: "touchid")
+                        .font(.system(size: 120))
+                        .foregroundColor(
+                            Color("MildPurple")
+                        )
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 60)
+
+                Spacer()
+
+                // MARK: Authentication Status
+
+                Text(
+                    viewModel.fingerprintMessage
+                )
+                .foregroundColor(.gray)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+                // MARK: Authentication Options
+
+                HStack {
+
+                    Button("Cancel") {
+
+                        onCancelDismiss()
+                    }
+
+                    Spacer()
+
+                    Button("Use Password") {
+
+                        onCancelDismiss()
+                    }
+                }
+                .foregroundColor(
+                    Color("MildPurple")
+                )
+                .padding(.horizontal, 40)
+
+                Spacer()
             }
         }
-        .navigationBarBackButtonHidden(true)
     }
 }
 
-#Preview {
-    FingerprintView()
-}
+// MARK: - Preview
 
+#Preview {
+
+    FingerprintView(
+        viewModel: AuthViewModel(),
+        onAuthenticationPassed: {},
+        onCancelDismiss: {}
+    )
+    .preferredColorScheme(.dark)
+}

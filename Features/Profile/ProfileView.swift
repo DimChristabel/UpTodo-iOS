@@ -8,165 +8,334 @@
 import SwiftUI
 
 // MARK: - ProfileView
+
+/// Displays the user's profile information,
+/// account settings, productivity statistics,
+/// and application-related options.
+///
+/// This screen also manages profile image updates,
+/// account management actions, and navigation to
+/// supporting informational screens.
 struct ProfileView: View {
-    
-    // ── Sheet states ──
-    @State private var showChangeName     = false
-    @State private var showChangePassword = false
-    @State private var showChangeImage    = false
-    @State private var showSettings       = false
-    
-    // ── User data ──
-    private let userName  = "Martha Hays"
-    private let tasksLeft = 10
-    private let tasksDone = 5
-    
+
+    // MARK: Properties
+
+    @ObservedObject
+    var viewModel: TaskViewModel
+
+    // MARK: Sheet States
+
+    @State private var showSettings = false
+    @State private var showAboutUs = false
+    @State private var showFAQ = false
+    @State private var showImagePicker = false
+    @State private var showCamera = false
+
+    @State private var showImageOptions = false
+    @State private var showHelpAndFeedback = false
+    @State private var showSupportUs = false
+
+    // MARK: Image Selection
+
+    @State private var selectedImage: UIImage?
+
+    // MARK: Body
+
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                
-                // ── Background ──
-                Color.black.ignoresSafeArea()
-                
+
+        ZStack {
+
+            Color.black
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+
+                // MARK: Header
+
+                Text("Profile")
+                    .font(.title2)
+                    .fontWeight(.medium)
+                    .foregroundColor(.white)
+                    .padding(.top, 12)
+                    .padding(.bottom, 24)
+
                 ScrollView(showsIndicators: false) {
+
                     VStack(spacing: 0) {
-                        
-                        // ── Title ──
-                        Text("Profile")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding(.top, 20)
-                            .padding(.bottom, 24)
-                        
-                        // ── Avatar ──
-                        Image("profileImage")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 85, height: 85)
+
+                        // MARK: User Profile
+
+                        VStack(spacing: 12) {
+
+                            Group {
+
+                                if let image = viewModel.profileUIImage {
+
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+
+                                } else {
+
+                                    Image("profileImage")
+                                        .resizable()
+                                        .scaledToFill()
+                                }
+                            }
+                            .frame(
+                                width: 90,
+                                height: 90
+                            )
                             .clipShape(Circle())
-                            .padding(.bottom, 20)
-                        
-                        // ── Name ──
-                        Text(userName)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding(.bottom, 20)
-                        
-                        // ── Task badges ──
-                        // ProfileBadge lives in ProfileComponents.swift
-                        HStack(spacing: 12) {
+
+                            Text(viewModel.userName)
+                                .font(
+                                    .system(
+                                        size: 20,
+                                        weight: .medium
+                                    )
+                                )
+                                .foregroundColor(.white)
+                        }
+                        .padding(.bottom, 30)
+
+                        // MARK: Productivity Statistics
+
+                        HStack(spacing: 16) {
+
                             ProfileBadge(
-                                title: "\(tasksLeft) Task left")
+                                title: "\(viewModel.incompleteTasksCount) Task left"
+                            )
+
                             ProfileBadge(
-                                title: "\(tasksDone) Task done")
+                                title: "\(viewModel.completedTasksCount) Task done"
+                            )
                         }
                         .padding(.horizontal, 24)
-                        .padding(.bottom, 32)
-                        
-                        // ── Settings section ──
-                        // ProfileSectionLabel lives in ProfileComponents.swift
-                        ProfileSectionLabel(title: "Settings")
-                        // ProfileRowItem lives in ProfileComponents.swift
+                        .padding(.bottom, 16)
+
+                        // MARK: Settings Section
+
+                        ProfileSectionLabel(
+                            title: "Settings"
+                        )
+
                         ProfileRowItem(
                             icon: "gearshape",
                             title: "App Settings"
-                        ) { showSettings = true }
-                        
-                        // ── Account section ──
-                        ProfileSectionLabel(title: "Account")
+                        ) {
+
+                            showSettings = true
+                        }
+
+                        ProfileRowItem(
+                            icon: "bubble.left.and.bubble.right",
+                            title: "Help & Feedback"
+                        ) {
+
+                            showHelpAndFeedback = true
+                        }
+
+                        ProfileRowItem(
+                            icon: "heart",
+                            title: "Support Us"
+                        ) {
+
+                            showSupportUs = true
+                        }
+
+                        // MARK: Account Section
+
+                        ProfileSectionLabel(
+                            title: "Account"
+                        )
+
                         ProfileRowItem(
                             icon: "person",
                             title: "Change account name"
-                        ) { showChangeName = true }
+                        ) {
+
+                            viewModel.showChangeNameSheet = true
+                        }
+
                         ProfileRowItem(
-                            icon: "lock",
-                            title: "Change account password"
-                        ) { showChangePassword = true }
+                            icon: "key",
+                            title: "Change password"
+                        ) {
+
+                            viewModel.showChangePasswordSheet = true
+                        }
+
                         ProfileRowItem(
                             icon: "camera",
-                            title: "Change account Image"
-                        ) { showChangeImage = true }
-                        
-                        // ── Uptodo section ──
-                        ProfileSectionLabel(title: "Uptodo")
-                        ProfileRowItem(
-                            icon: "square.grid.2x2",
-                            title: "About US"
-                        ) { }
+                            title: "Change image"
+                        ) {
+
+                            showImageOptions = true
+                        }
+
+                        // MARK: Application Information
+
+                        ProfileSectionLabel(
+                            title: "UpTodo"
+                        )
+
                         ProfileRowItem(
                             icon: "info.circle",
+                            title: "About Us"
+                        ) {
+
+                            showAboutUs = true
+                        }
+
+                        ProfileRowItem(
+                            icon: "questionmark.circle",
                             title: "FAQ"
-                        ) { }
-                        ProfileRowItem(
-                            icon: "bolt",
-                            title: "Help & Feedback"
-                        ) { }
-                        ProfileRowItem(
-                            icon: "hand.thumbsup",
-                            title: "Support US"
-                        ) { }
-                        
-                        // ── Log out ──
-                        // ProfileLogoutButton lives in ProfileComponents.swift
-                        ProfileLogoutButton(action: { })
-                        
-                        // Space for tab bar
-                        Spacer().frame(height: 100)
+                        ) {
+
+                            showFAQ = true
+                        }
+
+                        // MARK: Logout
+
+                        ProfileLogoutButton {
+
+                            viewModel.logout()
+                        }
+                        .padding(.top, 12)
                     }
+                    .padding(.bottom, 40)
                 }
-                
-                // ── Floating + button ──
-                // FABButton lives in AppButtons.swift
-                FABButton {
-                    // FAB action — can open add task
-                }
-                .padding(.bottom, 28)
             }
-            // ── Sheets ──
-            .sheet(isPresented: $showChangeName) {
-                ChangeNameSheet(isPresented: $showChangeName)
-                    .presentationDetents([.height(220)])
-                    .presentationCornerRadius(16)
-                    .presentationBackground(
-                        Color(red: 0.15,
-                              green: 0.15,
-                              blue: 0.15))
+        }
+
+        // MARK: Profile Image Observer
+
+        .onChange(
+            of: selectedImage
+        ) { _, newImage in
+
+            guard let image = newImage else {
+                return
             }
-            .sheet(isPresented: $showChangePassword) {
-                ChangePasswordSheet(isPresented: $showChangePassword)
-                    .presentationDetents([.height(320)])
-                    .presentationCornerRadius(16)
-                    .presentationBackground(
-                        Color(red: 0.15,
-                              green: 0.15,
-                              blue: 0.15))
+
+            viewModel.saveProfileImage(image)
+        }
+
+        // MARK: Image Source Selection
+
+        .confirmationDialog(
+            "Change Profile Image",
+            isPresented: $showImageOptions
+        ) {
+
+            Button("Take Photo") {
+
+                showCamera = true
             }
-            .sheet(isPresented: $showChangeImage) {
-                ChangeImageSheet(isPresented: $showChangeImage)
-                    .presentationDetents([.height(220)])
-                    .presentationCornerRadius(16)
-                    .presentationBackground(
-                        Color(red: 0.15,
-                              green: 0.15,
-                              blue: 0.15))
+
+            Button("Import from Gallery") {
+
+                showImagePicker = true
             }
-            // ── Settings Navigation ──
-            .navigationDestination(isPresented: $showSettings) {
-                SettingsView()
+
+            Button("Import from Google Drive") {
+
+                // Future Firebase Storage / Drive Integration
             }
-            .navigationBarHidden(true)
+
+            Button(
+                "Cancel",
+                role: .cancel
+            ) { }
+        }
+
+        // MARK: Settings Sheet
+
+        .sheet(
+            isPresented: $showSettings
+        ) {
+
+            SettingsView()
+        }
+
+        // MARK: Change Name Sheet
+
+        .sheet(
+            isPresented: $viewModel.showChangeNameSheet
+        ) {
+
+            ChangeNameSheetView(
+                viewModel: viewModel
+            )
+        }
+
+        // MARK: Change Password Sheet
+
+        .sheet(
+            isPresented: $viewModel.showChangePasswordSheet
+        ) {
+
+            ChangePasswordSheetView(
+                viewModel: viewModel
+            )
+        }
+
+        // MARK: About Us Sheet
+
+        .sheet(
+            isPresented: $showAboutUs
+        ) {
+
+            AboutUsView()
+        }
+
+        // MARK: FAQ Sheet
+
+        .sheet(
+            isPresented: $showFAQ
+        ) {
+
+            FAQView()
+        }
+
+        // MARK: Help & Feedback Sheet
+
+        .sheet(
+            isPresented: $showHelpAndFeedback
+        ) {
+
+            HelpAndFeedbackView()
+        }
+
+        // MARK: Support Us Sheet
+
+        .sheet(
+            isPresented: $showSupportUs
+        ) {
+
+            SupportUsView()
+        }
+
+        // MARK: Image Picker Sheet
+
+        .sheet(
+            isPresented: $showImagePicker
+        ) {
+
+            ImagePicker(
+                selectedImage: $selectedImage
+            )
         }
     }
 }
 
-// MARK: - Dummy Subviews (For Preview Compilation Safety)
-// These keep your project compiling if the individual sheet files aren't in your target scope yet.
-//struct ChangeNameSheet: View { @Binding var isPresented: Bool; var body: some View { Text("Change Name").foregroundColor(.white) } }
-//struct ChangePasswordSheet: View { @Binding var isPresented: Bool; var body: some View { Text("Change Password").foregroundColor(.white) } }
-//struct ChangeImageSheet: View { @Binding var isPresented: Bool; var body: some View { Text("Change Image").foregroundColor(.white) } }
-//struct SettingsView: View { var body: some View { Text("Settings Screen").foregroundColor(.white).frame(maxWidth: .infinity, maxHeight: .infinity).background(Color.black) } }
-
 // MARK: - Preview
+
 #Preview {
-    ProfileView()
+
+    ProfileView(
+        viewModel: TaskViewModel()
+    )
+    .preferredColorScheme(.dark)
 }

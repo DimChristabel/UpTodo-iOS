@@ -2,182 +2,188 @@
 //  SettingsView.swift
 //  upToDo
 //
-//  Created by Maxut Consulting on 04/06/2026.
+//  Created by Maxut Consulting on 15/06/2026.
 //
 
-import Foundation
 import SwiftUI
 
 // MARK: - SettingsView
+
+/// Provides application configuration options
+/// including appearance preferences, language,
+/// notification settings, and calendar integration.
+///
+/// This screen serves as the central location for
+/// user-specific application settings.
 struct SettingsView: View {
-    
-    @Environment(\.dismiss) var dismiss
-    
+
+    // MARK: Properties
+
+    @Environment(\.dismiss)
+    private var dismiss
+
+    @State private var notificationsEnabled = true
+
+    // MARK: Body
+
     var body: some View {
-        ZStack {
-            
-            //  Background
-            SettingsBackground()
-            
-            VStack(spacing: 0) {
-                
-                // Top Bar
-                SettingsTopBar(onBack: { dismiss() })
-                
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 0) {
-                        
-                        //  Settings Section
-                        SettingsSectionLabel(title: "Settings")
-                        
-                        SettingsRowItem(
-                            icon: "paintbrush",
-                            title: "Change app color"
-                        ) { }
-                        
-                        SettingsRowItem(
-                            icon: "textformat",
-                            title: "Change app typography"
-                        ) { }
-                        
-                        SettingsRowItem(
-                            icon: "globe",
-                            title: "Change app language"
-                        ) { }
-                        
-                        // ── Import Section ──
-                        SettingsSectionLabel(title: "Import")
-                        
-                        SettingsRowItem(
-                            icon: "arrow.down.circle",
-                            title: "Import from Google calendar"
-                        ) { }
+
+        NavigationStack {
+
+            ZStack {
+
+                Color.black
+                    .ignoresSafeArea()
+
+                ScrollView {
+
+                    VStack(spacing: 24) {
+
+                        // MARK: Appearance Settings
+
+                        settingsCard {
+
+                            SettingsRow(
+                                icon: "paintpalette",
+                                title: "App Color"
+                            )
+
+                            Divider()
+                                .overlay(Color.gray.opacity(0.3))
+
+                            SettingsRow(
+                                icon: "textformat",
+                                title: "Typography"
+                            )
+
+                            Divider()
+                                .overlay(Color.gray.opacity(0.3))
+
+                            SettingsRow(
+                                icon: "globe",
+                                title: "Language"
+                            )
+                        }
+
+                        // MARK: Application Preferences
+
+                        settingsCard {
+
+                            Toggle(
+                                "Notifications",
+                                isOn: $notificationsEnabled
+                            )
+                            .tint(Color("MildPurple"))
+                            .foregroundColor(.white)
+
+                            Divider()
+                                .overlay(Color.gray.opacity(0.3))
+
+                            SettingsRow(
+                                icon: "calendar",
+                                title: "Google Calendar"
+                            )
+                        }
+
+                        // MARK: Application Information
+
+                        VStack(spacing: 8) {
+
+                            Text("UpTodo")
+                                .font(.headline)
+                                .foregroundColor(.white)
+
+                            Text("Version 1.0")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.top, 20)
                     }
+                    .padding(24)
                 }
-                
-                Spacer()
+            }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+
+            // MARK: Navigation Controls
+
+            .toolbar {
+
+                ToolbarItem(
+                    placement: .topBarTrailing
+                ) {
+
+                    Button("Done") {
+
+                        dismiss()
+                    }
+                    .foregroundColor(
+                        Color("MildPurple")
+                    )
+                }
             }
         }
-        .navigationBarHidden(true)
+        .preferredColorScheme(.dark)
     }
-}
 
-// MARK: - Background
-struct SettingsBackground: View {
-    
-    // ── Change background color here ──
-    private let backgroundColor = Color.black
-    
-    var body: some View {
-        backgroundColor.ignoresSafeArea()
-    }
-}
+    // MARK: Settings Card
 
-// MARK: - Top Bar
-struct SettingsTopBar: View {
-    let onBack: () -> Void
-    
-    // ── Change top bar properties here ──
-    private let titleText      = "Settings"
-    private let titleFontSize  : CGFloat = 18
-    private let titleFontWeight = Font.Weight.semibold
-    private let titleColor     = Color.white
-    private let backIconSize   : CGFloat = 20
-    private let backIconWeight = Font.Weight.medium
-    private let backIconColor  = Color.white
-    private let topPadding     : CGFloat = 20
-    private let bottomPadding  : CGFloat = 16
-    private let horizPadding   : CGFloat = 16
-    
-    var body: some View {
-        ZStack {
-            // Centered title
-            Text(titleText)
-                .font(.system(size: titleFontSize,
-                              weight: titleFontWeight))
-                .foregroundColor(titleColor)
-            
-            // Back button left
-            HStack {
-                Button(action: onBack) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: backIconSize,
-                                      weight: backIconWeight))
-                        .foregroundColor(backIconColor)
-                }
-                Spacer()
-            }
-            .padding(.horizontal, horizPadding)
+    /// Creates a reusable container used to group
+    /// related settings into visually distinct sections.
+    @ViewBuilder
+    private func settingsCard<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+
+        VStack(spacing: 0) {
+
+            content()
         }
-        .padding(.top, topPadding)
-        .padding(.bottom, bottomPadding)
+        .padding()
+        .background(
+            Color.white.opacity(0.06)
+        )
+        .cornerRadius(16)
     }
 }
 
-// MARK: - Section Label
-struct SettingsSectionLabel: View {
+// MARK: - SettingsRow
+
+/// Reusable row component used throughout the
+/// settings screen to display configurable options.
+struct SettingsRow: View {
+
+    // MARK: Properties
+
+    let icon: String
     let title: String
-    
-    // ── Change section label properties here ──
-    private let fontSize      : CGFloat = 12
-    private let textColor     = Color.gray
-    private let topPadding    : CGFloat = 24
-    private let bottomPadding : CGFloat = 8
-    private let leftPadding   : CGFloat = 16
-    
+
+    // MARK: Body
+
     var body: some View {
+
         HStack {
+
+            Image(systemName: icon)
+                .foregroundColor(.white)
+                .frame(width: 24)
+
             Text(title)
-                .font(.system(size: fontSize))
-                .foregroundColor(textColor)
-                .padding(.horizontal, leftPadding)
-                .padding(.top, topPadding)
-                .padding(.bottom, bottomPadding)
+                .foregroundColor(.white)
+
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .foregroundColor(.gray)
         }
+        .padding(.vertical, 12)
     }
 }
-
-// MARK: - Settings Row Item
-//struct SettingsRowItem: View {
-//    let icon  : String
-//    let title : String
-//    let action: () -> Void
-//    
-//    // ── Change row properties here ──
-//    private let iconSize       : CGFloat = 20
-//    private let iconColor      = Color.white
-//    private let iconFrameWidth : CGFloat = 28
-//    private let titleFontSize  : CGFloat = 15
-//    private let titleColor     = Color.white
-//    private let chevronSize    : CGFloat = 13
-//    private let chevronColor   = Color.gray
-//    private let iconSpacing    : CGFloat = 14
-//    private let horizPadding   : CGFloat = 16
-//    private let vertPadding    : CGFloat = 18
-//    
-//    var body: some View {
-//        Button(action: action) {
-//            HStack(spacing: iconSpacing) {
-//                Image(systemName: icon)
-//                    .font(.system(size: iconSize))
-//                    .foregroundColor(iconColor)
-//                    .frame(width: iconFrameWidth)
-//                Text(title)
-//                    .font(.system(size: titleFontSize))
-//                    .foregroundColor(titleColor)
-//                Spacer()
-//                Image(systemName: "chevron.right")
-//                    .font(.system(size: chevronSize))
-//                    .foregroundColor(chevronColor)
-//            }
-//            .padding(.horizontal, horizPadding)
-//            .padding(.vertical, vertPadding)
-//        }
-//    }
-//}
 
 // MARK: - Preview
+
 #Preview {
+
     SettingsView()
+        .preferredColorScheme(.dark)
 }

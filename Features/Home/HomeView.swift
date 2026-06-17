@@ -3,207 +3,454 @@
 import SwiftUI
 
 // MARK: - HomeView
+
+/// Main dashboard screen of the application.
+///
+/// Displays active and completed tasks,
+/// supports searching and filtering,
+/// allows task management actions,
+/// and provides access to user profile information.
+
 struct HomeView: View {
 
-    @State private var showAddTask   = false
-    @State private var searchText    = ""
-    @State private var showTodayOnly = true
+    // MARK: Properties
+@ObservedObject var viewModel: TaskViewModel
 
-    @State private var tasks: [TaskItem] = [
-        TaskItem(id: UUID().uuidString,
-                 title: "Do Math Homework",
-                 description: "Math Assignment",
-                 dueDate: Date(),
-                 dueTime: "16:45",
-                 isCompleted: false,
-                 createdAt: Date()),
+let onProfileTapped: () -> Void
 
-        TaskItem(id: UUID().uuidString,
-                 title: "Take out dogs",
-                 description: "Evening walk",
-                 dueDate: Date(),
-                 dueTime: "18:20",
-                 isCompleted: false,
-                 createdAt: Date()),
+@State
+private var selectedTask: AppTask?
+@State private var taskToDelete: AppTask?
 
-        TaskItem(id: UUID().uuidString,
-                 title: "Business meeting with CEO",
-                 description: "Discuss roadmap",
-                 dueDate: Date(),
-                 dueTime: "08:15",
-                 isCompleted: false,
-                 createdAt: Date()),
+@State
+private var showFilterMenu = false
+ 
+    // MARK: Body
 
-        TaskItem(id: UUID().uuidString,
-                 title: "Buy Grocery",
-                 description: "Milk and Bread",
-                 dueDate: Date(),
-                 dueTime: "16:45",
-                 isCompleted: true,
-                 createdAt: Date())
-    ]
-
-    // MARK: - Filters
-    private var filteredTasks: [TaskItem] {
-        searchText.isEmpty
-        ? tasks
-        : tasks.filter {
-            $0.title.localizedCaseInsensitiveContains(searchText)
-        }
-    }
-
-    private var displayedTasks: [TaskItem] {
-        guard showTodayOnly else { return filteredTasks }
-        return filteredTasks.filter {
-            Calendar.current.isDateInToday($0.dueDate)
-        }
-    }
-
-    private var incompleteTasks: [TaskItem] {
-        displayedTasks.filter { !$0.isCompleted }
-    }
-
-    private var completedTasks: [TaskItem] {
-        displayedTasks.filter { $0.isCompleted }
-    }
-
-    // MARK: - UI
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Color.black.ignoresSafeArea()
+
+    NavigationStack {
+
+        ZStack {
+
+            Color.black
+                .ignoresSafeArea()
 
             VStack(spacing: 0) {
 
-                // Top Bar
+                // MARK: Navigation Header
+
                 HStack {
-                    Image(systemName: "line.3.horizontal")
+
+                    Button {
+
+                        showFilterMenu = true
+
+                    } label: {
+
+                        Image(
+                            systemName: "line.3.horizontal.decrease"
+                        )
+                        .font(.title2)
                         .foregroundColor(.white)
-                        .frame(width: 42, height: 42)
+                    }
 
                     Spacer()
 
                     Text("Index")
+                        .font(.title2)
+                        .fontWeight(.medium)
                         .foregroundColor(.white)
-                        .font(.system(size: 20))
 
                     Spacer()
 
-                    Image("ProfileImage2")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 42, height: 42)
+                    Button {
+
+                        print("PROFILE IMAGE TAPPED")
+
+                        onProfileTapped()
+
+                    } label: {
+
+                        Group {
+
+                            if let image =
+                                viewModel.profileUIImage {
+
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+
+                            } else {
+
+                                Image("profileImage")
+                                    .resizable()
+                                    .scaledToFill()
+                            }
+                        }
+                        .frame(
+                            width: 42,
+                            height: 42
+                        )
                         .clipShape(Circle())
+                    }
                 }
-                .padding()
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
 
-                if displayedTasks.isEmpty {
+                // MARK: Task Filter Options
+
+                .confirmationDialog(
+                    "Filter Tasks",
+                    isPresented: $showFilterMenu
+                ) {
+
+                    Button("Today's Tasks") {
+
+                        viewModel.todayOnlyFilter = true
+                    }
+
+                    Button("All Tasks") {
+
+                        viewModel.todayOnlyFilter = false
+                    }
+
+                    Button(
+                        "Cancel",
+                        role: .cancel
+                    ) { }
+                }
+
+                // MARK: Empty Task State
+
+                if viewModel.tasks.isEmpty {
 
                     Spacer()
 
-                    Image("empty_state")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 227, height: 227)
-
-                    Text("What do you want to do today?")
-                        .foregroundColor(.white)
-
-                    Text("Tap + to add your tasks")
-                        .foregroundColor(.white)
+                    EmptyHomeView()
 
                     Spacer()
 
                 } else {
-
-                    ScrollView {
-                        VStack(spacing: 0) {
-
-                            ForEach(incompleteTasks) { task in
-                                TaskRowView(task: task) {
-                                    toggleTask(task)
-                                }
+                    
+                    VStack(spacing: 16) {
+                        
+                        // MARK: Task Search
+                        
+                        HStack {
+                            
+                            Image(
+                                systemName: "magnifyingglass"
+                            )
+                            .foregroundColor(.gray)
+                            
+                            TextField(
+                                "",
+                                text: $viewModel.searchText,
+                                prompt: Text(
+                                    "Search for your task..."
+                                )
+                                .foregroundColor(.gray)
+                            )
+                            .foregroundColor(.white)
+                        }
+                        .padding()
+                        .background(
+                            Color.white.opacity(0.08)
+                        )
+                        .cornerRadius(12)
+                        .padding(.top, 24)
+                        
+                        
+                        // MARK: Quick Filters
+                        
+                        HStack {
+                            
+                            Button {
+                                
+                                viewModel.todayOnlyFilter = true
+                                
+                            } label: {
+                                
+                                Text("Today")
+                                    .font(.caption)
+                                    .foregroundColor(
+                                        viewModel.todayOnlyFilter
+                                        ? .white
+                                        : .gray
+                                    )
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        viewModel.todayOnlyFilter
+                                        ? Color("MildPurple")
+                                        : Color.white.opacity(0.08)
+                                    )
+                                    .cornerRadius(20)
                             }
-
-                            if !completedTasks.isEmpty {
-
-                                Text("Completed")
+                            
+                            Button {
+                                
+                                viewModel.todayOnlyFilter = false
+                                
+                            } label: {
+                                
+                                Text("All")
+                                    .font(.caption)
+                                    .foregroundColor(
+                                        !viewModel.todayOnlyFilter
+                                        ? .white
+                                        : .gray
+                                    )
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        !viewModel.todayOnlyFilter
+                                        ? Color("MildPurple")
+                                        : Color.white.opacity(0.08)
+                                    )
+                                    .cornerRadius(20)
+                            }
+                            
+                            Spacer()
+                        }
+                        
+                        // MARK: Today Filter Label
+                        
+                        if viewModel.todayOnlyFilter {
+                            
+                            HStack {
+                                
+                                Image(systemName: "calendar")
+                                
+                                Text(
+                                    "Showing Today's Tasks"
+                                )
+                            }
+                            .font(.caption)
+                            .foregroundColor(
+                                Color("MildPurple")
+                            )
+                        }
+                        
+                        // MARK: Search Results Empty State
+                        
+                        if viewModel.filteredTasks.isEmpty {
+                            
+                            Spacer()
+                            
+                            VStack(spacing: 16) {
+                                
+                                Image(
+                                    systemName: "magnifyingglass"
+                                )
+                                .font(
+                                    .system(size: 50)
+                                )
+                                .foregroundColor(.gray)
+                                
+                                Text("Task not found")
+                                    .font(.headline)
                                     .foregroundColor(.white)
+                                
+                                Text(
+                                    "Try searching with another keyword"
+                                )
+                                .foregroundColor(.gray)
+                            }
+                            
+                            Spacer()
+                            
+                        } else {
+                            
+                            List {
+                                
+                                // MARK: Active Task List
+                                
+                                if !viewModel.activeTasks.isEmpty {
+                                    
+                                    Section {
+                                        
+                                        ForEach(
+                                            viewModel.activeTasks
+                                        ) { task in
+                                            
+                                            TaskCard(
+                                                task: task,
 
-                                ForEach(completedTasks) { task in
-                                    TaskRowView(task: task) {
-                                        toggleTask(task)
+                                                onToggle: {
+
+                                                    viewModel.toggleTask(task)
+                                                },
+
+                                                onTap: {
+
+                                                    selectedTask = task
+                                                }
+                                            )
+                                            .listRowBackground(Color.black)
+                                            .listRowSeparator(.hidden)
+                                            .listRowInsets(
+                                                EdgeInsets(
+                                                    top: 8,
+                                                    leading: 0,
+                                                    bottom: 8,
+                                                    trailing: 0
+                                                )
+                                            )
+                                            .swipeActions(
+                                                edge: .trailing
+                                            )  {
+                                                
+                                                Button(
+                                                    role: .destructive
+                                                ) {
+                                                    
+                                                    taskToDelete = task
+                                                    
+                                                } label: {
+                                                    
+                                                    Label(
+                                                        "Delete",
+                                                        systemImage: "trash"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        
+                                    } header: {
+                                        
+                                        Text("Tasks")
+                                            .foregroundColor(.white)
+                                    }
+                                }
+                                
+                                // MARK: Completed Task List
+                                
+                                if !viewModel.completedTasks.isEmpty {
+                                    
+                                    Section {
+                                        
+                                        ForEach(viewModel.completedTasks) { task in
+                                            
+                                            TaskCard(
+                                                task: task,
+                                                onToggle: {
+                                                    viewModel.toggleTask(task)
+                                                },
+                                                onTap: {
+                                                    selectedTask = task
+                                                }
+                                            )
+                                            .listRowBackground(Color.black)
+                                            .listRowSeparator(.hidden)
+                                            .listRowInsets(
+                                                EdgeInsets(
+                                                    top: 8,
+                                                    leading: 0,
+                                                    bottom: 8,
+                                                    trailing: 0))
+                                        }
+                                        
+                                    } header: {
+                                        
+                                        HStack {
+                                            
+                                            Text("Completed")
+                                                .font(.headline)
+                                                .foregroundColor(.white)
+                                            
+                                            Spacer()
+                                        }
                                     }
                                 }
                             }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
+                            .background(Color.black)
+                            .environment(
+                                \.defaultMinListRowHeight,
+                                90
+                            )
+                            .padding(.horizontal, 24)
                         }
-                        .padding(.bottom, 120)
+                       
                     }
                 }
             }
         }
+        .navigationBarHidden(true)
     }
+        // MARK: Task Detail Sheet
+    .sheet(
+        item: $selectedTask
+    ) { task in
 
-    // MARK: - FUNCTIONS (CORRECT PLACE)
-    func toggleTask(_ task: TaskItem) {
-        if let i = tasks.firstIndex(where: { $0.id == task.id }) {
-            tasks[i].isCompleted.toggle()
+        TaskDetailView(
+            viewModel: viewModel,
+            task: task
+        )
+    }
+    
+        // MARK: Delete Confirmation Alert
+    .alert(
+        "Delete Task?",
+        isPresented: Binding(
+            get: {
+                taskToDelete != nil
+            },
+            set: { value in
+
+                if !value {
+
+                    taskToDelete = nil
+                }
+            }
+        )
+    ) {
+
+        Button(
+            "Delete",
+            role: .destructive
+        ) {
+
+            if let task = taskToDelete {
+
+                viewModel.deleteTask(task)
+            }
+
+            taskToDelete = nil
         }
+
+        Button(
+            "Cancel",
+            role: .cancel
+        ) {
+
+            taskToDelete = nil
+        }
+
+    } message: {
+
+        Text(
+            "This task will be permanently deleted."
+        )
     }
 }
 
-// MARK: - Task Row
-struct TaskRowView: View {
-    let task    : TaskItem
-    let onToggle: () -> Void
-    
-    var body: some View {
-        HStack(spacing: 14) {
-            Button(action: onToggle) {
-                ZStack {
-                    Circle()
-                        .strokeBorder(
-                            task.isCompleted
-                            ? Color("MildPurple")
-                            : Color.gray,
-                            lineWidth: 1.5)
-                        .frame(width: 16, height: 16)
-                    
-                    if task.isCompleted {
-                        Circle()
-                            .fill(Color("MildPurple"))
-                            .frame(width: 16, height: 16)
-                    }
-                }
-            }
-            
-            VStack(alignment: .leading, spacing: 16) {
-                Text(task.title)
-                    .font(.system(size: 16,
-                                  weight: .regular))
-                    .frame(width: .infinity, height: 21, alignment: .leading)
-                    .foregroundColor(task.isCompleted
-                                     ? .gray : .white)
-                    .strikethrough(task.isCompleted,
-                                   color: .gray)
-                
-                Text("Today At \(task.dueTime)")
-                    .frame(width: .infinity, height: 21)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundColor(.gray)
-            }
-            Spacer()
-        }
-        .frame(width: 372, height: 72, alignment: .leading)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 10)
-        .background(Color.white.opacity(0.2))
-        .cornerRadius(10)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 7)
-    }
+
 }
 
 // MARK: - Preview
+
 #Preview {
-    HomeView()
+
+
+HomeView(
+    viewModel: TaskViewModel(),
+    onProfileTapped: {}
+)
+.preferredColorScheme(.dark)
+
+
 }
