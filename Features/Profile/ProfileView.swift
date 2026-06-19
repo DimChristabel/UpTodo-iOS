@@ -88,7 +88,12 @@ struct ProfileView: View {
                             )
                             .clipShape(Circle())
 
-                            Text(viewModel.userName)
+                            VStack(spacing: 4) {
+
+                                Text(
+                                    viewModel.currentUser?.displayName
+                                    ?? "User"
+                                )
                                 .font(
                                     .system(
                                         size: 20,
@@ -96,6 +101,14 @@ struct ProfileView: View {
                                     )
                                 )
                                 .foregroundColor(.white)
+
+                                Text(
+                                    viewModel.currentUser?.email
+                                    ?? ""
+                                )
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                            }
                         }
                         .padding(.bottom, 30)
 
@@ -208,7 +221,12 @@ struct ProfileView: View {
                 }
             }
         }
+        .onAppear {
 
+            viewModel.loadCurrentUser()
+        }
+        
+        
         // MARK: Profile Image Observer
 
         .onChange(

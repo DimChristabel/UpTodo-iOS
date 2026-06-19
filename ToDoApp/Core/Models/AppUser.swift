@@ -5,24 +5,23 @@
 //  Created by Maxut Consulting on 04/06/2026.
 //
 import Foundation
+import FirebaseFirestore
 
-// MARK: - App User Model
-/// Represents a registered application user.
+// MARK: - AppUser
+
+/// Represents an authenticated user
+/// stored in Firestore.
 struct AppUser: Identifiable, Codable {
 
-    /// Firestore document id.
+    // MARK: Properties
+
     let id: String
 
-    /// User display name.
     var displayName: String
 
-    /// User email address.
     var email: String
 
-    /// Profile image url.
     var avatarURL: String
 
-    /// Account creation date.
     var createdAt: Date
 }
-

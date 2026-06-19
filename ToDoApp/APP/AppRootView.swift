@@ -11,17 +11,31 @@ import SwiftUI
 
 /// Root navigation container for the application.
 ///
-/// Responsible for managing the app's navigation flow,
-/// including onboarding, authentication, biometric
-/// verification, and the main dashboard experience.
+/// Controls:
+/// - Intro
+/// - Onboarding
+/// - Authentication
+/// - Biometric Verification
+/// - Dashboard
+///
+/// Restores Firebase authentication sessions
+/// and automatically reloads Firestore user
+/// data and tasks.
 struct AppRootView: View {
 
-    // MARK: Properties
+    // MARK: Navigation State
 
     @State private var currentState: AppNavigationState = .intro
 
+    // MARK: View Models
+
     @StateObject private var authViewModel = AuthViewModel()
+
     @StateObject private var taskViewModel = TaskViewModel()
+
+    // MARK: Session Manager
+
+    @StateObject private var sessionManager = SessionManager()
 
     // MARK: Body
 
@@ -34,7 +48,7 @@ struct AppRootView: View {
 
             switch currentState {
 
-            // MARK: Intro Flow
+            // MARK: Intro
 
             case .intro:
 
@@ -48,12 +62,25 @@ struct AppRootView: View {
 
                             withAnimation(.easeInOut) {
 
-                                currentState = .onboarding
+                                if sessionManager.isLoggedIn {
+
+                                    // Load User Profile
+                                    taskViewModel.loadCurrentUser()
+
+                                    // Load Firestore Tasks
+                                    taskViewModel.loadTasks()
+
+                                    currentState = .dashboard
+
+                                } else {
+
+                                    currentState = .onboarding
+                                }
                             }
                         }
                     }
 
-            // MARK: Onboarding Flow
+            // MARK: Onboarding
 
             case .onboarding:
 
@@ -64,9 +91,11 @@ struct AppRootView: View {
                         currentState = .welcome
                     }
                 }
-                .transition(.move(edge: .trailing))
+                .transition(
+                    .move(edge: .trailing)
+                )
 
-            // MARK: Welcome Flow
+            // MARK: Welcome
 
             case .welcome:
 
@@ -96,9 +125,11 @@ struct AppRootView: View {
                         }
                     }
                 )
-                .transition(.move(edge: .leading))
+                .transition(
+                    .move(edge: .leading)
+                )
 
-            // MARK: Login Flow
+            // MARK: Login
 
             case .login:
 
@@ -107,6 +138,11 @@ struct AppRootView: View {
                     viewModel: authViewModel,
 
                     onLoginSuccess: {
+
+                        sessionManager.refreshSession()
+
+                        taskViewModel.loadCurrentUser()
+                        taskViewModel.loadTasks()
 
                         withAnimation(.easeInOut) {
 
@@ -130,9 +166,11 @@ struct AppRootView: View {
                         }
                     }
                 )
-                .transition(.move(edge: .trailing))
+                .transition(
+                    .move(edge: .trailing)
+                )
 
-            // MARK: Registration Flow
+            // MARK: Register
 
             case .register:
 
@@ -141,6 +179,11 @@ struct AppRootView: View {
                     viewModel: authViewModel,
 
                     onRegisterSuccess: {
+
+                        sessionManager.refreshSession()
+
+                        taskViewModel.loadCurrentUser()
+                        taskViewModel.loadTasks()
 
                         withAnimation(.easeInOut) {
 
@@ -164,9 +207,11 @@ struct AppRootView: View {
                         }
                     }
                 )
-                .transition(.move(edge: .trailing))
+                .transition(
+                    .move(edge: .trailing)
+                )
 
-            // MARK: Biometric Authentication Flow
+            // MARK: Fingerprint
 
             case .fingerprint:
 
@@ -175,6 +220,9 @@ struct AppRootView: View {
                     viewModel: authViewModel,
 
                     onAuthenticationPassed: {
+
+                        taskViewModel.loadCurrentUser()
+                        taskViewModel.loadTasks()
 
                         withAnimation(.easeInOut) {
 
@@ -191,13 +239,23 @@ struct AppRootView: View {
                     }
                 )
 
-            // MARK: Main Application Flow
+            // MARK: Dashboard
 
             case .dashboard:
 
                 MainTabView(
                     viewModel: taskViewModel
                 )
+                .onAppear {
+
+                    guard sessionManager.isLoggedIn
+                    else {
+                        return
+                    }
+
+                    taskViewModel.loadCurrentUser()
+                    taskViewModel.loadTasks()
+                }
             }
         }
 
@@ -211,7 +269,19 @@ struct AppRootView: View {
                 return
             }
 
+            sessionManager.refreshSession()
+
+            // Clear cached data
+
+            taskViewModel.tasks.removeAll()
+            taskViewModel.currentUser = nil
+
+            authViewModel.email = ""
+            authViewModel.password = ""
+            authViewModel.confirmPassword = ""
+
             currentState = .welcome
+
             taskViewModel.isLoggedOut = false
         }
     }

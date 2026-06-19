@@ -1,15 +1,22 @@
 
-
 import SwiftUI
+import FirebaseCore
 
 // MARK: - UpTodoApp
 
 /// Entry point of the UpTodo application.
 ///
-/// Responsible for launching the app and
-/// loading the root navigation container.
+/// Responsible for configuring Firebase
+/// and loading the application's root view.
 @main
 struct UpTodoApp: App {
+
+    // MARK: Initializer
+
+    init() {
+
+        FirebaseApp.configure()
+    }
 
     // MARK: Body
 

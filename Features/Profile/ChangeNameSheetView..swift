@@ -9,21 +9,31 @@ import SwiftUI
 
 // MARK: - ChangeNameSheetView
 
-/// Allows users to update their account display name.
+/// Allows users to update their
+/// account display name.
 ///
-/// The updated name is validated before being
-/// saved through the TaskViewModel.
+/// The updated name is validated
+/// before being saved to Firestore.
+///
+/// Any successful update is
+/// immediately reflected throughout
+/// the application.
 struct ChangeNameSheetView: View {
 
-    // MARK: Properties
+    // MARK: Environment
 
     @Environment(\.dismiss)
     private var dismiss
 
+    // MARK: Properties
+
     @ObservedObject
     var viewModel: TaskViewModel
 
-    @State private var newName = ""
+    // MARK: Form State
+
+    @State
+    private var newName = ""
 
     // MARK: Body
 
@@ -43,8 +53,10 @@ struct ChangeNameSheetView: View {
 
                     // MARK: Instructions
 
-                    Text("Enter your new account name")
-                        .foregroundColor(.gray)
+                    Text(
+                        "Enter your new account name"
+                    )
+                    .foregroundColor(.gray)
 
                     // MARK: Name Input
 
@@ -63,8 +75,15 @@ struct ChangeNameSheetView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Change Account Name")
-            .navigationBarTitleDisplayMode(.inline)
+
+            // MARK: Navigation Title
+
+            .navigationTitle(
+                "Change Account Name"
+            )
+            .navigationBarTitleDisplayMode(
+                .inline
+            )
 
             // MARK: Navigation Controls
 
@@ -87,19 +106,17 @@ struct ChangeNameSheetView: View {
 
                     Button("Save") {
 
-                        viewModel.changeUserName(
-                            newName
-                        )
-
-                        dismiss()
+                        saveName()
                     }
                     .foregroundColor(
                         Color("MildPurple")
                     )
                     .disabled(
-                        newName.trimmingCharacters(
-                            in: .whitespacesAndNewlines
-                        ).isEmpty
+                        newName
+                            .trimmingCharacters(
+                                in: .whitespacesAndNewlines
+                            )
+                            .isEmpty
                     )
                 }
             }
@@ -109,8 +126,34 @@ struct ChangeNameSheetView: View {
 
         .onAppear {
 
-            newName = viewModel.userName
+            newName =
+            viewModel.currentUser?
+                .displayName
+            ?? viewModel.userName
         }
+    }
+
+    // MARK: Save Name
+
+    /// Validates and updates the
+    /// user's display name.
+    private func saveName() {
+
+        let cleanedName =
+        newName.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard !cleanedName.isEmpty
+        else {
+            return
+        }
+
+        viewModel.updateUserName(
+            newName: cleanedName
+        )
+
+        dismiss()
     }
 }
 

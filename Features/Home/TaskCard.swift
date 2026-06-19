@@ -90,7 +90,12 @@ struct TaskCard: View {
 
                     Text("•")
 
-                    Text(task.dueTime)
+                    Text(
+                        task.dueTime.formatted(
+                            date: .omitted,
+                            time: .shortened
+                        )
+                    )
                 }
                 .font(.caption2)
                 .foregroundColor(.gray)
@@ -150,10 +155,11 @@ struct TaskCard: View {
     TaskCard(
         task: AppTask(
             id: UUID().uuidString,
+            userId: "preview-user",
             title: "Complete SwiftUI Project",
             description: "Build UpTodo App",
             dueDate: Date(),
-            dueTime: "14:30",
+            dueTime: Date(),
             priority: 8,
             isCompleted: false,
             createdAt: Date()
@@ -163,4 +169,5 @@ struct TaskCard: View {
     )
     .padding()
     .background(Color.black)
+    .preferredColorScheme(.dark)
 }

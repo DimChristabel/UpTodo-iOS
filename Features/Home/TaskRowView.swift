@@ -40,8 +40,8 @@ struct TaskRowView: View {
                 Image(
                     systemName:
                         task.isCompleted
-                    ? "checkmark.circle.fill"
-                    : "circle"
+                        ? "checkmark.circle.fill"
+                        : "circle"
                 )
                 .foregroundColor(
                     task.isCompleted
@@ -53,19 +53,28 @@ struct TaskRowView: View {
             // MARK: Task Information
 
             VStack(
-                alignment: .leading
+                alignment: .leading,
+                spacing: 4
             ) {
 
                 Text(task.title)
                     .foregroundColor(.white)
 
-                Text(task.description)
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                if !task.description.isEmpty {
 
-                Text(task.dueTime)
-                    .font(.caption2)
-                    .foregroundColor(.gray)
+                    Text(task.description)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+
+                Text(
+                    task.dueTime.formatted(
+                        date: .omitted,
+                        time: .shortened
+                    )
+                )
+                .font(.caption2)
+                .foregroundColor(.gray)
             }
 
             Spacer()
@@ -93,10 +102,11 @@ struct TaskRowView: View {
         TaskRowView(
             task: AppTask(
                 id: UUID().uuidString,
+                userId: "preview-user",
                 title: "Sample Task",
                 description: "Complete project documentation",
                 dueDate: Date(),
-                dueTime: "14:30",
+                dueTime: Date(),
                 priority: 5,
                 isCompleted: false,
                 createdAt: Date()

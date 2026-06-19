@@ -179,7 +179,8 @@ private var showFilterMenu = false
                                         ? .white
                                         : .gray
                                     )
-                                    .padding(.horizontal, 16)
+                                    
+                                    .padding(.horizontal, 11)
                                     .padding(.vertical, 8)
                                     .background(
                                         viewModel.todayOnlyFilter
@@ -236,29 +237,36 @@ private var showFilterMenu = false
                         // MARK: Search Results Empty State
                         
                         if viewModel.filteredTasks.isEmpty {
-                            
+
                             Spacer()
-                            
-                            VStack(spacing: 16) {
-                                
-                                Image(
-                                    systemName: "magnifyingglass"
+
+                            if !viewModel.searchText
+                                .trimmingCharacters(
+                                    in: .whitespacesAndNewlines
                                 )
-                                .font(
-                                    .system(size: 50)
-                                )
-                                .foregroundColor(.gray)
-                                
-                                Text("Task not found")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                
-                                Text(
-                                    "Try searching with another keyword"
-                                )
-                                .foregroundColor(.gray)
+                                .isEmpty {
+
+                                VStack(spacing: 16) {
+
+                                    Image(systemName: "magnifyingglass")
+                                        .font(.system(size: 50))
+                                        .foregroundColor(.gray)
+
+                                    Text("Task not found")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+
+                                    Text(
+                                        "Try searching with another keyword"
+                                    )
+                                    .foregroundColor(.gray)
+                                }
+
+                            } else {
+
+                                EmptyHomeView()
                             }
-                            
+
                             Spacer()
                             
                         } else {

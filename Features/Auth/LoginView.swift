@@ -12,9 +12,14 @@ import SwiftUI
 /// Provides the user login interface.
 ///
 /// Allows existing users to authenticate using
-/// their credentials and access the application.
-/// The screen also provides navigation to account
-/// registration and alternative social login options.
+/// Firebase Authentication and access the
+/// application dashboard.
+///
+/// The screen also provides:
+/// - Password reset
+/// - Google Sign-In
+/// - Apple Sign-In
+/// - Navigation to registration
 struct LoginView: View {
 
     // MARK: Properties
@@ -80,12 +85,12 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .padding(.bottom, 12)
 
-                    // MARK: Username Input
+                    // MARK: Email Input
 
                     AuthTextField(
-                        title: "Username",
-                        placeholder: "Enter username",
-                        text: $viewModel.username
+                        title: "Email",
+                        placeholder: "Enter your email",
+                        text: $viewModel.email
                     )
 
                     // MARK: Password Input
@@ -96,15 +101,62 @@ struct LoginView: View {
                         text: $viewModel.password
                     )
 
-                    // MARK: Login Action
+                    // MARK: Forgot Password
+
+                    HStack {
+
+                        Spacer()
+
+                        Button("Forgot Password?") {
+
+                            viewModel.forgotPassword()
+                        }
+                        .foregroundColor(
+                            Color("MildPurple")
+                        )
+                        .font(.footnote)
+                    }
+
+                    // MARK: Validation Error
+
+                    if !viewModel.errorMessage.isEmpty {
+
+                        Text(viewModel.errorMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+
+                    // MARK: Login Button
 
                     PrimaryButton(
-                        title: "Login"
+                        title: viewModel.isLoading
+                        ? "Signing In..."
+                        : "Login"
                     ) {
+
+                        guard !viewModel.isLoading else {
+                            return
+                        }
 
                         viewModel.login {
 
                             onLoginSuccess()
+                        }
+                    }
+                    .disabled(viewModel.isLoading)
+
+                    // MARK: Loading Indicator
+
+                    if viewModel.isLoading {
+
+                        HStack {
+
+                            Spacer()
+
+                            ProgressView()
+                                .tint(.white)
+
+                            Spacer()
                         }
                     }
 
@@ -112,20 +164,28 @@ struct LoginView: View {
 
                     ORDivider()
 
-                    // MARK: Social Authentication
+                    // MARK: Google Authentication
 
-                    SocialButton(
-                        title: "Login with Google",
-                        icon: "globe"
+                    SocialAuthButton(
+                        title: "Continue with Google",
+                        systemIcon: nil,
+                        assetIcon: "google_icon"
                     ) {
 
+                        // Google Sign-In
+                        // will be connected later.
                     }
 
-                    SocialButton(
-                        title: "Login with Apple",
-                        icon: "apple.logo"
+                    // MARK: Apple Authentication
+
+                    SocialAuthButton(
+                        title: "Continue with Apple",
+                        systemIcon: nil,
+                        assetIcon: "apple_icon"
                     ) {
 
+                        // Apple Sign-In
+                        // will be connected later.
                     }
 
                     Spacer()
@@ -153,6 +213,23 @@ struct LoginView: View {
                 .padding(.top, 60)
                 .padding(.bottom, 24)
             }
+        }
+
+        // MARK: Error Alert
+
+        .alert(
+            "Authentication Error",
+            isPresented: $viewModel.showError
+        ) {
+
+            Button("OK") {
+
+                viewModel.showError = false
+            }
+
+        } message: {
+
+            Text(viewModel.errorMessage)
         }
     }
 }

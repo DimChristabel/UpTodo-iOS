@@ -56,20 +56,12 @@ struct TaskDetailView: View {
             initialValue: task.dueDate
         )
 
-        _priority = State(
-            initialValue: task.priority
+        _dueTime = State(
+            initialValue: task.dueTime
         )
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-
-        let time =
-        formatter.date(
-            from: task.dueTime
-        ) ?? Date()
-
-        _dueTime = State(
-            initialValue: time
+        _priority = State(
+            initialValue: task.priority
         )
     }
 
@@ -266,9 +258,6 @@ struct TaskDetailView: View {
 
     // MARK: Task Update
 
-    /// Saves all modifications made to the task
-    /// and updates the task collection through
-    /// the TaskViewModel.
     private func saveChanges() {
 
         viewModel.updateTask(
@@ -292,10 +281,11 @@ struct TaskDetailView: View {
         viewModel: TaskViewModel(),
         task: AppTask(
             id: UUID().uuidString,
+            userId: "preview-user",
             title: "Sample Task",
             description: "Sample Description",
             dueDate: Date(),
-            dueTime: "10:00",
+            dueTime: Date(),
             priority: 1,
             isCompleted: false,
             createdAt: Date()

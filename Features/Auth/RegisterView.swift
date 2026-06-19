@@ -12,9 +12,8 @@ import SwiftUI
 /// Provides the user registration interface.
 ///
 /// Allows new users to create an account by
-/// entering a username, password, and password
-/// confirmation before proceeding to biometric
-/// authentication.
+/// entering their details before creating
+/// an account.
 struct RegisterView: View {
 
     // MARK: Properties
@@ -80,12 +79,20 @@ struct RegisterView: View {
                         .foregroundColor(.white)
                         .padding(.bottom, 12)
 
-                    // MARK: Username Input
+                    // MARK: Full Name Input
 
                     AuthTextField(
-                        title: "Username",
-                        placeholder: "Enter username",
-                        text: $viewModel.username
+                        title: "Full Name",
+                        placeholder: "Enter your full name",
+                        text: $viewModel.fullName
+                    )
+
+                    // MARK: Email Input
+
+                    AuthTextField(
+                        title: "Email",
+                        placeholder: "Enter your email",
+                        text: $viewModel.email
                     )
 
                     // MARK: Password Input
@@ -104,16 +111,63 @@ struct RegisterView: View {
                         text: $viewModel.confirmPassword
                     )
 
+                    // MARK: Validation Error
+
+                    if !viewModel.errorMessage.isEmpty {
+
+                        Text(viewModel.errorMessage)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+
                     // MARK: Register Button
 
                     PrimaryButton(
-                        title: "Register"
+                        title: viewModel.isLoading
+                        ? "Creating Account..."
+                        : "Register"
                     ) {
+
+                        guard !viewModel.isLoading else {
+                            return
+                        }
 
                         viewModel.register {
 
                             onRegisterSuccess()
                         }
+                    }
+                    .disabled(viewModel.isLoading)
+
+                    // MARK: Loading Indicator
+
+                    if viewModel.isLoading {
+
+                        HStack {
+
+                            Spacer()
+
+                            ProgressView()
+                                .tint(.white)
+
+                            Spacer()
+                        }
+                    }
+
+                    // MARK: Divider
+
+                    ORDivider()
+
+                    // MARK: Google Sign In
+
+                    SocialAuthButton(
+                        title: "Continue with Google",
+                        systemIcon: nil,
+                        assetIcon: "google_icon"
+                    ) {
+
+                        // Google Sign-In will be
+                        // connected in a later step.
                     }
 
                     Spacer()
@@ -141,6 +195,23 @@ struct RegisterView: View {
                 .padding(.top, 60)
                 .padding(.bottom, 24)
             }
+        }
+
+        // MARK: Error Alert
+
+        .alert(
+            "Registration Error",
+            isPresented: $viewModel.showError
+        ) {
+
+            Button("OK") {
+
+                viewModel.showError = false
+            }
+
+        } message: {
+
+            Text(viewModel.errorMessage)
         }
     }
 }

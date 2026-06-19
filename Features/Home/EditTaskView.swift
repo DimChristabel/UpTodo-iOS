@@ -110,7 +110,7 @@ struct EditTaskView: View {
             title = task.title
             description = task.description
             dueDate = task.dueDate
-            dueTime = task.dueDate
+            dueTime = task.dueTime
             selectedPriority = task.priority
         }
     }
@@ -142,10 +142,11 @@ struct EditTaskView: View {
         viewModel: TaskViewModel(),
         task: AppTask(
             id: UUID().uuidString,
+            userId: "preview-user",
             title: "Sample Task",
             description: "Sample Description",
             dueDate: Date(),
-            dueTime: "10:00 AM",
+            dueTime: Date(),
             priority: 1,
             isCompleted: false,
             createdAt: Date()
