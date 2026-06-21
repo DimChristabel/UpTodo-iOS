@@ -219,6 +219,45 @@ final class FirestoreService {
         }
     }
     
+    
+    // MARK: Toggle Task Completion
+
+    /// Updates a task's completion status
+    /// inside Firestore.
+    func toggleTaskCompletion(
+        task: AppTask,
+        completion: @escaping (
+            Result<Void, Error>
+        ) -> Void
+    ) {
+
+        db.collection("users")
+            .document(task.userId)
+            .collection("tasks")
+            .document(task.id)
+            .updateData([
+
+                "isCompleted": !task.isCompleted
+
+            ]) { error in
+
+                if let error {
+
+                    completion(
+                        .failure(error)
+                    )
+
+                } else {
+
+                    completion(
+                        .success(())
+                    )
+                }
+            }
+    }
+    
+    
+    
     // MARK: Delete Task
 
     /// Deletes a task document from Firestore.

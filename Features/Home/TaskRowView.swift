@@ -33,7 +33,9 @@ struct TaskRowView: View {
 
             Button {
 
-                viewModel.toggleTask(task)
+                viewModel.toggleTaskCompletion(
+                    task: task
+                )
 
             } label: {
 
@@ -42,11 +44,6 @@ struct TaskRowView: View {
                         task.isCompleted
                         ? "checkmark.circle.fill"
                         : "circle"
-                )
-                .foregroundColor(
-                    task.isCompleted
-                    ? Color("MildPurple")
-                    : .gray
                 )
             }
 

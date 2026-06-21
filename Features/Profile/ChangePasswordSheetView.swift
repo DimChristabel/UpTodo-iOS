@@ -11,13 +11,13 @@ import SwiftUI
 
 /// Allows users to update their account password.
 ///
-/// Users must provide their current password,
-/// enter a new password, and confirm the new
-/// password before submitting the change.
+/// Users must enter:
+/// - Current Password
+/// - New Password
+/// - Confirm Password
 ///
-/// Note:
-/// Password validation and Firebase Authentication
-/// integration will be implemented in a future update.
+/// The new password is validated before
+/// being updated in Firebase Authentication.
 struct ChangePasswordSheetView: View {
 
     // MARK: Properties
@@ -25,85 +25,190 @@ struct ChangePasswordSheetView: View {
     @ObservedObject
     var viewModel: TaskViewModel
 
+    @Environment(\.dismiss)
+    private var dismiss
+
+    // MARK: Form Values
+
     @State private var oldPassword = ""
 
     @State private var newPassword = ""
 
     @State private var confirmPassword = ""
 
+    // MARK: UI State
+
+    @State private var errorMessage = ""
+
+    @State private var showError = false
+
+    @State private var isLoading = false
+
     // MARK: Body
 
     var body: some View {
 
-        ZStack {
+        NavigationStack {
 
-            Color.black.opacity(0.5)
-                .ignoresSafeArea()
+            ZStack {
 
-            VStack(spacing: 20) {
+                Color.black
+                    .ignoresSafeArea()
 
-                // MARK: Sheet Title
+                VStack(
+                    spacing: 20
+                ) {
 
-                Text("Change Password")
-                    .font(.headline)
-                    .foregroundColor(.white)
+                    // MARK: Current Password
 
-                // MARK: Password Inputs
+                    SecureField(
+                        "Current Password",
+                        text: $oldPassword
+                    )
+                    .padding()
+                    .background(
+                        Color.white.opacity(0.08)
+                    )
+                    .cornerRadius(12)
 
-                SecureField(
-                    "Current Password",
-                    text: $oldPassword
-                )
-                .padding()
-                .background(
-                    Color.white.opacity(0.08)
-                )
-                .cornerRadius(8)
+                    // MARK: New Password
 
-                SecureField(
-                    "New Password",
-                    text: $newPassword
-                )
-                .padding()
-                .background(
-                    Color.white.opacity(0.08)
-                )
-                .cornerRadius(8)
+                    SecureField(
+                        "New Password",
+                        text: $newPassword
+                    )
+                    .padding()
+                    .background(
+                        Color.white.opacity(0.08)
+                    )
+                    .cornerRadius(12)
 
-                SecureField(
-                    "Confirm Password",
-                    text: $confirmPassword
-                )
-                .padding()
-                .background(
-                    Color.white.opacity(0.08)
-                )
-                .cornerRadius(8)
+                    // MARK: Confirm Password
 
-                // MARK: Sheet Actions
+                    SecureField(
+                        "Confirm Password",
+                        text: $confirmPassword
+                    )
+                    .padding()
+                    .background(
+                        Color.white.opacity(0.08)
+                    )
+                    .cornerRadius(12)
 
-                HStack {
+                    if isLoading {
 
-                    Button("Cancel") {
-
-                        viewModel.showChangePasswordSheet = false
+                        ProgressView()
                     }
 
                     Spacer()
+                }
+                .padding()
+            }
 
-                    Button("Update") {
+            .navigationTitle("Change Password")
+            .navigationBarTitleDisplayMode(.inline)
 
-                        viewModel.showChangePasswordSheet = false
+            // MARK: Toolbar
+
+            .toolbar {
+
+                ToolbarItem(
+                    placement: .topBarLeading
+                ) {
+
+                    Button("Cancel") {
+
+                        dismiss()
                     }
                 }
-                .foregroundColor(
-                    Color("MildPurple")
-                )
+
+                ToolbarItem(
+                    placement: .topBarTrailing
+                ) {
+
+                    Button("Save") {
+
+                        updatePassword()
+                    }
+                    .disabled(isLoading)
+                }
             }
-            .padding()
-            .frame(width: 320)
-            .background(Color.black)
-            .cornerRadius(12)
+
+            // MARK: Alert
+
+            .alert(
+                "Error",
+                isPresented: $showError
+            ) {
+
+                Button("OK") { }
+
+            } message: {
+
+                Text(errorMessage)
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    // MARK: Password Update
+
+    private func updatePassword() {
+
+        guard !newPassword.isEmpty else {
+
+            errorMessage =
+            "Password cannot be empty."
+
+            showError = true
+
+            return
+        }
+
+        guard newPassword.count >= 6 else {
+
+            errorMessage =
+            "Password must be at least 6 characters."
+
+            showError = true
+
+            return
+        }
+
+        guard newPassword == confirmPassword else {
+
+            errorMessage =
+            "Passwords do not match."
+
+            showError = true
+
+            return
+        }
+
+        isLoading = true
+
+        viewModel.changePassword(
+
+            currentPassword: oldPassword,
+
+            newPassword: newPassword
+
+        ) { result in
+            isLoading = false
+
+            switch result {
+
+            case .success:
+
+                dismiss()
+
+            case .failure(let error):
+
+                errorMessage =
+                error.localizedDescription
+
+                showError = true
+            }
         }
     }
 }

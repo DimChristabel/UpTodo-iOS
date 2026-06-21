@@ -442,13 +442,13 @@ final class TaskViewModel: ObservableObject {
 
         firestoreService.updateTask(
             task: updatedTask
-        ) { result in
+        ) { [weak self] result in
 
             switch result {
 
             case .success:
 
-                print("Task updated")
+                self?.loadTasks()
 
             case .failure(let error):
 
@@ -459,7 +459,6 @@ final class TaskViewModel: ObservableObject {
             }
         }
     }
-    
     
     
     // MARK: Toggle Task
@@ -486,6 +485,38 @@ final class TaskViewModel: ObservableObject {
             }
         }
     }
+    
+    
+    // MARK: Toggle Task Completion
+
+    /// Toggles a task's completion state.
+    func toggleTaskCompletion(
+        task: AppTask
+    ) {
+
+        FirestoreService.shared
+            .toggleTaskCompletion(
+                task: task
+            ) { result in
+
+                switch result {
+
+                case .success:
+
+                    break
+
+                case .failure(let error):
+
+                    print(
+                        error.localizedDescription
+                    )
+                }
+            }
+    }
+    
+    
+    
+    
     
     // MARK: Delete Task
     /// Permanently removes a task.
@@ -686,9 +717,38 @@ final class TaskViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Change Password
+
+    /// Updates the authenticated user's
+    /// Firebase Authentication password.
     
-    
-    
+
+    func changePassword(
+
+        currentPassword: String,
+
+        newPassword: String,
+
+        completion: @escaping (
+            Result<Void, Error>
+        ) -> Void
+    ) {
+
+        AuthService.shared
+            .reauthenticateAndChangePassword(
+
+                currentPassword: currentPassword,
+
+                newPassword: newPassword
+
+            ) { result in
+
+                DispatchQueue.main.async {
+
+                    completion(result)
+                }
+            }
+    }
     
     // MARK: Cleanup
 

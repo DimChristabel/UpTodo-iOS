@@ -34,6 +34,8 @@ struct EditTaskView: View {
     @State private var dueTime = Date()
     @State private var selectedPriority = 1
 
+    @State private var showPriorityPicker = false
+
     // MARK: Body
 
     var body: some View {
@@ -83,6 +85,28 @@ struct EditTaskView: View {
                         displayedComponents: .hourAndMinute
                     )
                 }
+
+                // MARK: Priority
+
+                Section("Priority") {
+
+                    Button {
+
+                        showPriorityPicker = true
+
+                    } label: {
+
+                        HStack {
+
+                            Text("Priority")
+
+                            Spacer()
+
+                            Text("\(selectedPriority)")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
             }
 
             .navigationTitle("Edit Task")
@@ -112,6 +136,17 @@ struct EditTaskView: View {
             dueDate = task.dueDate
             dueTime = task.dueTime
             selectedPriority = task.priority
+        }
+
+        // MARK: Priority Picker Sheet
+
+        .sheet(
+            isPresented: $showPriorityPicker
+        ) {
+
+            PriorityPickerView(
+                selectedPriority: $selectedPriority
+            )
         }
     }
 
