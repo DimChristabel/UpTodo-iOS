@@ -21,8 +21,11 @@ struct ProfileView: View {
     // MARK: Properties
 
     @ObservedObject
-    var viewModel: TaskViewModel
+    var profileViewModel: ProfileViewModel
 
+    @ObservedObject
+    var taskViewModel: TaskViewModel
+    
     // MARK: Sheet States
 
     @State private var showSettings = false
@@ -34,6 +37,7 @@ struct ProfileView: View {
     @State private var showImageOptions = false
     @State private var showHelpAndFeedback = false
     @State private var showSupportUs = false
+    @State private var showLogoutConfirmation = false
 
     // MARK: Image Selection
 
@@ -42,41 +46,41 @@ struct ProfileView: View {
     // MARK: Body
 
     var body: some View {
-
+        
         ZStack {
-
+            
             Color.black
                 .ignoresSafeArea()
-
+            
             VStack(spacing: 0) {
-
+                
                 // MARK: Header
-
+                
                 Text("Profile")
                     .font(.title2)
                     .fontWeight(.medium)
                     .foregroundColor(.white)
                     .padding(.top, 12)
                     .padding(.bottom, 24)
-
+                
                 ScrollView(showsIndicators: false) {
-
+                    
                     VStack(spacing: 0) {
-
+                        
                         // MARK: User Profile
-
+                        
                         VStack(spacing: 12) {
-
+                            
                             Group {
-
-                                if let image = viewModel.profileUIImage {
-
+                                
+                                if let image = profileViewModel.profileUIImage{
+                                    
                                     Image(uiImage: image)
                                         .resizable()
                                         .scaledToFill()
-
+                                    
                                 } else {
-
+                                    
                                     Image("profileImage")
                                         .resizable()
                                         .scaledToFill()
@@ -87,11 +91,11 @@ struct ProfileView: View {
                                 height: 90
                             )
                             .clipShape(Circle())
-
+                            
                             VStack(spacing: 4) {
-
+                                
                                 Text(
-                                    viewModel.currentUser?.displayName
+                                    profileViewModel.currentUser?.displayName
                                     ?? "User"
                                 )
                                 .font(
@@ -101,9 +105,9 @@ struct ProfileView: View {
                                     )
                                 )
                                 .foregroundColor(.white)
-
+                                
                                 Text(
-                                    viewModel.currentUser?.email
+                                    profileViewModel.currentUser?.email
                                     ?? ""
                                 )
                                 .font(.caption)
@@ -111,109 +115,109 @@ struct ProfileView: View {
                             }
                         }
                         .padding(.bottom, 30)
-
+                        
                         // MARK: Productivity Statistics
-
+                        
                         HStack(spacing: 16) {
-
+                            
                             ProfileBadge(
-                                title: "\(viewModel.incompleteTasksCount) Task left"
+                                title: "\(taskViewModel.incompleteTasksCount) Task left"
                             )
-
+                            
                             ProfileBadge(
-                                title: "\(viewModel.completedTasksCount) Task done"
+                                title: "\(taskViewModel.completedTasksCount) Task done"
                             )
                         }
                         .padding(.horizontal, 24)
                         .padding(.bottom, 16)
-
+                        
                         // MARK: Settings Section
-
+                        
                         ProfileSectionLabel(
                             title: "Settings"
                         )
-
+                        
                         ProfileRowItem(
                             icon: "gearshape",
                             title: "App Settings"
                         ) {
-
+                            
                             showSettings = true
                         }
-
+                        
                         ProfileRowItem(
                             icon: "bubble.left.and.bubble.right",
                             title: "Help & Feedback"
                         ) {
-
+                            
                             showHelpAndFeedback = true
                         }
-
+                        
                         ProfileRowItem(
                             icon: "heart",
                             title: "Support Us"
                         ) {
-
+                            
                             showSupportUs = true
                         }
-
+                        
                         // MARK: Account Section
-
+                        
                         ProfileSectionLabel(
                             title: "Account"
                         )
-
+                        
                         ProfileRowItem(
                             icon: "person",
                             title: "Change account name"
                         ) {
-
-                            viewModel.showChangeNameSheet = true
+                            
+                            profileViewModel.showChangeNameSheet = true
                         }
-
+                        
                         ProfileRowItem(
                             icon: "key",
                             title: "Change password"
                         ) {
-
-                            viewModel.showChangePasswordSheet = true
+                            
+                            profileViewModel.showChangePasswordSheet = true
                         }
-
+                        
                         ProfileRowItem(
                             icon: "camera",
                             title: "Change image"
                         ) {
-
+                            
                             showImageOptions = true
                         }
-
+                        
                         // MARK: Application Information
-
+                        
                         ProfileSectionLabel(
                             title: "UpTodo"
                         )
-
+                        
                         ProfileRowItem(
                             icon: "info.circle",
                             title: "About Us"
                         ) {
-
+                            
                             showAboutUs = true
                         }
-
+                        
                         ProfileRowItem(
                             icon: "questionmark.circle",
                             title: "FAQ"
                         ) {
-
+                            
                             showFAQ = true
                         }
-
+                        
                         // MARK: Logout
-
+                        
                         ProfileLogoutButton {
-
-                            viewModel.logout()
+                            
+                            showLogoutConfirmation = true
                         }
                         .padding(.top, 12)
                     }
@@ -222,44 +226,146 @@ struct ProfileView: View {
             }
         }
         .onAppear {
-
-            viewModel.loadCurrentUser()
+            
+            profileViewModel.loadCurrentUser()
         }
         
         
         // MARK: Profile Image Observer
-
+        
         .onChange(
             of: selectedImage
         ) { _, newImage in
-
+            
             guard let image = newImage else {
                 return
             }
-
-            viewModel.saveProfileImage(image)
+            
+            profileViewModel.uploadProfileImage(
+                image
+            )
         }
-
+        
         // MARK: Image Source Selection
-
+        
         .confirmationDialog(
             "Change Profile Image",
             isPresented: $showImageOptions
         ) {
-
+            
             Button("Take Photo") {
-
+                
                 showCamera = true
             }
-
+            
             Button("Import from Gallery") {
-
+                
                 showImagePicker = true
             }
-
+            
             Button("Import from Google Drive") {
-
+                
                 // Future Firebase Storage / Drive Integration
+            }
+            
+            Button(
+                "Cancel",
+                role: .cancel
+            ) { }
+        }
+        
+        // MARK: Settings Sheet
+        
+        .sheet(
+            isPresented: $showSettings
+        ) {
+            
+            SettingsView()
+        }
+        
+        // MARK: Change Name Sheet
+        
+        .sheet(
+            isPresented: $profileViewModel.showChangeNameSheet
+        ) {
+            
+            ChangeNameSheetView(
+                viewModel: profileViewModel
+            )
+        }
+        
+        // MARK: Change Password Sheet
+        
+        .sheet(
+            isPresented: $profileViewModel.showChangePasswordSheet
+        ) {
+            
+            ChangePasswordSheetView(
+                viewModel: profileViewModel
+            )
+        }
+        
+        // MARK: About Us Sheet
+        
+        .sheet(
+            isPresented: $showAboutUs
+        ) {
+            
+            AboutUsView()
+        }
+        
+        // MARK: FAQ Sheet
+        
+        .sheet(
+            isPresented: $showFAQ
+        ) {
+            
+            FAQView()
+        }
+        
+        // MARK: Help & Feedback Sheet
+        
+        .sheet(
+            isPresented: $showHelpAndFeedback
+        ) {
+            
+            HelpAndFeedbackView()
+        }
+        
+        // MARK: Support Us Sheet
+        
+        .sheet(
+            isPresented: $showSupportUs
+        ) {
+            
+            SupportUsView()
+        }
+        
+        // MARK: Image Picker Sheet
+        
+        .sheet(
+            isPresented: $showImagePicker
+        ) {
+            
+            ImagePicker(
+                selectedImage: $selectedImage
+            )
+        }
+        
+        // MARK: Logout Confirmation
+
+        .confirmationDialog(
+            "Are you sure you want to log out?",
+            isPresented: $showLogoutConfirmation,
+            titleVisibility: .visible
+        ) {
+
+            Button(
+                "Log Out",
+                role: .destructive
+            ) {
+
+                profileViewModel.logout()
             }
 
             Button(
@@ -267,85 +373,8 @@ struct ProfileView: View {
                 role: .cancel
             ) { }
         }
-
-        // MARK: Settings Sheet
-
-        .sheet(
-            isPresented: $showSettings
-        ) {
-
-            SettingsView()
-        }
-
-        // MARK: Change Name Sheet
-
-        .sheet(
-            isPresented: $viewModel.showChangeNameSheet
-        ) {
-
-            ChangeNameSheetView(
-                viewModel: viewModel
-            )
-        }
-
-        // MARK: Change Password Sheet
-
-        .sheet(
-            isPresented: $viewModel.showChangePasswordSheet
-        ) {
-
-            ChangePasswordSheetView(
-                viewModel: viewModel
-            )
-        }
-
-        // MARK: About Us Sheet
-
-        .sheet(
-            isPresented: $showAboutUs
-        ) {
-
-            AboutUsView()
-        }
-
-        // MARK: FAQ Sheet
-
-        .sheet(
-            isPresented: $showFAQ
-        ) {
-
-            FAQView()
-        }
-
-        // MARK: Help & Feedback Sheet
-
-        .sheet(
-            isPresented: $showHelpAndFeedback
-        ) {
-
-            HelpAndFeedbackView()
-        }
-
-        // MARK: Support Us Sheet
-
-        .sheet(
-            isPresented: $showSupportUs
-        ) {
-
-            SupportUsView()
-        }
-
-        // MARK: Image Picker Sheet
-
-        .sheet(
-            isPresented: $showImagePicker
-        ) {
-
-            ImagePicker(
-                selectedImage: $selectedImage
-            )
-        }
     }
+    
 }
 
 // MARK: - Preview
@@ -353,7 +382,8 @@ struct ProfileView: View {
 #Preview {
 
     ProfileView(
-        viewModel: TaskViewModel()
+        profileViewModel: ProfileViewModel(),
+        taskViewModel: TaskViewModel()
     )
     .preferredColorScheme(.dark)
 }

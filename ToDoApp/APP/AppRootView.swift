@@ -30,8 +30,8 @@ struct AppRootView: View {
     // MARK: View Models
 
     @StateObject private var authViewModel = AuthViewModel()
-
     @StateObject private var taskViewModel = TaskViewModel()
+    @StateObject private var profileViewModel = ProfileViewModel()
 
     // MARK: Session Manager
 
@@ -65,7 +65,7 @@ struct AppRootView: View {
                                 if sessionManager.isLoggedIn {
 
                                     // Load User Profile
-                                    taskViewModel.loadCurrentUser()
+                                    profileViewModel.loadCurrentUser()
 
                                     // Load Firestore Tasks
                                     taskViewModel.loadTasks()
@@ -141,9 +141,8 @@ struct AppRootView: View {
 
                         sessionManager.refreshSession()
 
-                        taskViewModel.loadCurrentUser()
+                        profileViewModel.loadCurrentUser()
                         taskViewModel.loadTasks()
-
                         withAnimation(.easeInOut) {
 
                             currentState = .fingerprint
@@ -181,10 +180,8 @@ struct AppRootView: View {
                     onRegisterSuccess: {
 
                         sessionManager.refreshSession()
-
-                        taskViewModel.loadCurrentUser()
+                        profileViewModel.loadCurrentUser()
                         taskViewModel.loadTasks()
-
                         withAnimation(.easeInOut) {
 
                             currentState = .fingerprint
@@ -221,7 +218,7 @@ struct AppRootView: View {
 
                     onAuthenticationPassed: {
 
-                        taskViewModel.loadCurrentUser()
+                        profileViewModel.loadCurrentUser()
                         taskViewModel.loadTasks()
 
                         withAnimation(.easeInOut) {
@@ -244,7 +241,8 @@ struct AppRootView: View {
             case .dashboard:
 
                 MainTabView(
-                    viewModel: taskViewModel
+                    taskViewModel: taskViewModel,
+                    profileViewModel: profileViewModel
                 )
                 .onAppear {
 
@@ -253,7 +251,7 @@ struct AppRootView: View {
                         return
                     }
 
-                    taskViewModel.loadCurrentUser()
+                    profileViewModel.loadCurrentUser()
                     taskViewModel.loadTasks()
                 }
             }
@@ -262,7 +260,7 @@ struct AppRootView: View {
         // MARK: Logout Observer
 
         .onChange(
-            of: taskViewModel.isLoggedOut
+            of: profileViewModel.isLoggedOut
         ) { _, newValue in
 
             guard newValue else {
@@ -271,10 +269,7 @@ struct AppRootView: View {
 
             sessionManager.refreshSession()
 
-            // Clear cached data
-
             taskViewModel.tasks.removeAll()
-            taskViewModel.currentUser = nil
 
             authViewModel.email = ""
             authViewModel.password = ""
@@ -282,7 +277,7 @@ struct AppRootView: View {
 
             currentState = .welcome
 
-            taskViewModel.isLoggedOut = false
+            profileViewModel.isLoggedOut = false
         }
     }
 }

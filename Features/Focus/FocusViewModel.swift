@@ -15,6 +15,7 @@ import SwiftUI
 enum FocusSessionType {
 
     case work
+
     case breakTime
 }
 
@@ -41,6 +42,8 @@ final class FocusViewModel: ObservableObject {
 
     @Published var alertMessage = ""
 
+    @Published var completedSessions = 0
+
     // MARK: Private Properties
 
     private var totalTime = 25 * 60
@@ -54,7 +57,9 @@ final class FocusViewModel: ObservableObject {
     /// Prevents multiple timers from running simultaneously.
     func start() {
 
-        guard !isRunning else { return }
+        guard !isRunning else {
+            return
+        }
 
         isRunning = true
 
@@ -67,7 +72,9 @@ final class FocusViewModel: ObservableObject {
             .autoconnect()
             .sink { [weak self] _ in
 
-                guard let self else { return }
+                guard let self else {
+                    return
+                }
 
                 if self.timeRemaining > 0 {
 
@@ -89,6 +96,7 @@ final class FocusViewModel: ObservableObject {
     func pause() {
 
         timer?.cancel()
+
         isRunning = false
     }
 
@@ -99,9 +107,14 @@ final class FocusViewModel: ObservableObject {
         pause()
 
         sessionType = .work
+
         totalTime = 25 * 60
+
         timeRemaining = totalTime
+
         progress = 1
+
+        completedSessions = 0
     }
 
     // MARK: Session Management
@@ -114,10 +127,14 @@ final class FocusViewModel: ObservableObject {
 
         if sessionType == .work {
 
+            completedSessions += 1
+
             sessionType = .breakTime
 
             totalTime = 5 * 60
+
             timeRemaining = totalTime
+
             progress = 1
 
             alertMessage =
@@ -128,7 +145,9 @@ final class FocusViewModel: ObservableObject {
             sessionType = .work
 
             totalTime = 25 * 60
+
             timeRemaining = totalTime
+
             progress = 1
 
             alertMessage =
@@ -145,6 +164,7 @@ final class FocusViewModel: ObservableObject {
     var timeString: String {
 
         let minutes = timeRemaining / 60
+
         let seconds = timeRemaining % 60
 
         return String(

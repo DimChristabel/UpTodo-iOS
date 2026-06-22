@@ -28,7 +28,7 @@ struct ChangeNameSheetView: View {
     // MARK: Properties
 
     @ObservedObject
-    var viewModel: TaskViewModel
+    var viewModel: ProfileViewModel
 
     // MARK: Form State
 
@@ -162,7 +162,7 @@ struct ChangeNameSheetView: View {
 #Preview {
 
     ChangeNameSheetView(
-        viewModel: TaskViewModel()
+        viewModel: ProfileViewModel()
     )
     .preferredColorScheme(.dark)
 }

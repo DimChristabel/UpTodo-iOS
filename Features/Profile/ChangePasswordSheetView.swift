@@ -23,7 +23,7 @@ struct ChangePasswordSheetView: View {
     // MARK: Properties
 
     @ObservedObject
-    var viewModel: TaskViewModel
+    var viewModel: ProfileViewModel
 
     @Environment(\.dismiss)
     private var dismiss
@@ -218,7 +218,7 @@ struct ChangePasswordSheetView: View {
 #Preview {
 
     ChangePasswordSheetView(
-        viewModel: TaskViewModel()
+        viewModel: ProfileViewModel()
     )
     .preferredColorScheme(.dark)
 }

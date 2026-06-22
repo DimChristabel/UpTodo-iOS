@@ -16,6 +16,10 @@ struct HomeView: View {
     // MARK: Properties
 @ObservedObject var viewModel: TaskViewModel
 
+    /// Handles profile-related data
+    /// such as profile image and user info.
+@StateObject private var profileViewModel = ProfileViewModel()
+
 let onProfileTapped: () -> Void
 
 @State
@@ -75,7 +79,7 @@ private var showFilterMenu = false
                         Group {
 
                             if let image =
-                                viewModel.profileUIImage {
+                                profileViewModel.profileUIImage {
 
                                 Image(uiImage: image)
                                     .resizable()
@@ -400,6 +404,15 @@ private var showFilterMenu = false
         )
     }
     
+        
+    // MARK: Initial Data Load
+    .onAppear {
+
+        profileViewModel.loadCurrentUser()
+    }
+        
+        
+        
         // MARK: Delete Confirmation Alert
     .alert(
         "Delete Task?",

@@ -28,43 +28,26 @@ import FirebaseFirestore
 
 final class TaskViewModel: ObservableObject {
     
-    // MARK: User Profile
     
-    @Published var userName = "Dim Christabel"
     
     // MARK: Search & Filtering
-    
     @Published var searchText = ""
     
     // MARK: Task Collection
-    
     @Published var tasks: [AppTask] = []
     
-    // MARK: Profile Image
-    
-    @Published var profileImageData: Data?
-    
     // MARK: Calendar State
-    
     @Published var selectedDate = Date()
     
-    @Published var currentUser: AppUser?
-    
     // MARK: UI States
-    
     @Published var showAddTaskSheet = false
-    @Published var showChangeNameSheet = false
-    @Published var showChangePasswordSheet = false
     @Published var todayOnlyFilter = true
-    @Published var isLoggedOut = false
+  
     
     // MARK: Storage Keys
-    
-    
     private let profileImageKey = "profile_image"
     
     // MARK: Firestore
-    
     private let firestoreService =
     FirestoreService.shared
     
@@ -72,11 +55,7 @@ final class TaskViewModel: ObservableObject {
     
     init() {
 
-        loadProfileImage()
-
         if Auth.auth().currentUser != nil {
-
-            loadCurrentUser()
 
             loadTasks()
         }
@@ -215,38 +194,63 @@ final class TaskViewModel: ObservableObject {
         selectedDate = newDate
     }
     
+    // MARK: Move To Previous Month
     /// Moves calendar selection
     /// to the previous month.
     func moveToPreviousMonth() {
-        
-        guard let newDate =
-                Calendar.current.date(
-                    byAdding: .month,
-                    value: -1,
-                    to: selectedDate
-                )
+
+        let calendar = Calendar.current
+
+        guard let previousMonth =
+            calendar.date(
+                byAdding: .month,
+                value: -1,
+                to: selectedDate
+            )
         else {
             return
         }
-        
-        selectedDate = newDate
+
+        let components =
+        calendar.dateComponents(
+            [.year, .month],
+            from: previousMonth
+        )
+
+        selectedDate =
+        calendar.date(
+            from: components
+        ) ?? previousMonth
     }
     
+   
+    // MARK: Move To Next Month
     /// Moves calendar selection
     /// to the next month.
-    func moveToNextMonth() {
-        
-        guard let newDate =
-                Calendar.current.date(
-                    byAdding: .month,
-                    value: 1,
-                    to: selectedDate
-                )
+   func moveToNextMonth() {
+
+        let calendar = Calendar.current
+
+        guard let nextMonth =
+            calendar.date(
+                byAdding: .month,
+                value: 1,
+                to: selectedDate
+            )
         else {
             return
         }
-        
-        selectedDate = newDate
+
+        let components =
+        calendar.dateComponents(
+            [.year, .month],
+            from: nextMonth
+        )
+
+        selectedDate =
+        calendar.date(
+            from: components
+        ) ?? nextMonth
     }
     
     // MARK: Filtered Tasks
@@ -544,23 +548,23 @@ final class TaskViewModel: ObservableObject {
     /// Signs the user out of Firebase Authentication
     /// and resets session-related UI state.
     func logout() {
-        
+
         do {
-            
+
             try AuthService.shared.logout()
-            
+
             firestoreService.stopListening()
-            
+
             tasks.removeAll()
-            
+
             searchText = ""
+
             todayOnlyFilter = false
+
             selectedDate = Date()
-            
-            isLoggedOut = true
-            
+
         } catch {
-            
+
             print(
                 "Logout Failed:",
                 error.localizedDescription
@@ -568,137 +572,6 @@ final class TaskViewModel: ObservableObject {
         }
     }
     
-    // MARK: Profile Image Management
-    /// Stores a selected profile image
-    /// in local device storage.
-    
-    /// Loads the user's saved profile image.
-    /// Loads the user's saved profile image.
-    func saveProfileImage(
-        _ image: UIImage
-    ) {
-        
-        guard let data =
-                image.jpegData(
-                    compressionQuality: 0.8
-                )
-        else {
-            return
-        }
-        
-        profileImageData = data
-        
-        UserDefaults.standard.set(
-            data,
-            forKey: profileImageKey
-        )
-    }
-    
-    // MARK: - Load Current User
-
-    /// Retrieves the authenticated
-    /// user's profile from Firestore.
-    func loadCurrentUser() {
-
-        UserFirestoreService.shared
-            .fetchCurrentUser {
-
-                [weak self] result in
-
-                DispatchQueue.main.async {
-
-                    switch result {
-
-                    case .success(let user):
-
-                        self?.currentUser = user
-                        self?.userName = user.displayName
-
-                    case .failure(let error):
-
-                        print(
-                            "Load User Error:",
-                            error.localizedDescription
-                        )
-                    }
-                }
-            }
-    }
-    
-    
-    // MARK: - Update User Name
-
-    /// Updates the user's display name
-    /// inside Firestore and refreshes
-    /// the local Profile screen data.
-    ///
-    /// - Parameter newName:
-    /// The updated display name.
-    func updateUserName(
-        newName: String
-    ) {
-
-        guard let userId =
-                currentUser?.id
-        else {
-
-            return
-        }
-
-        UserFirestoreService.shared
-            .updateDisplayName(
-
-                userId: userId,
-
-                newName: newName
-
-            ) { [weak self] result in
-
-                DispatchQueue.main.async {
-
-                    switch result {
-
-                    case .success:
-
-                        // Update Local State
-
-                        self?.currentUser?.displayName =
-                        newName
-
-                        self?.userName =
-                        newName
-
-                    case .failure(let error):
-
-                        print(
-                            "Update Name Error:",
-                            error.localizedDescription
-                        )
-                    }
-                }
-            }
-    }
-    
-    
-    /// Loads the user's saved profile image.
-    private func loadProfileImage() {
-        
-        profileImageData =
-        UserDefaults.standard.data(
-            forKey: profileImageKey
-        )
-    }
-    
-    /// Converts stored image data into
-    /// a UIImage for display purposes.
-    var profileUIImage: UIImage? {
-        
-        guard let data = profileImageData else {
-            return nil
-        }
-        
-        return UIImage(data: data)
-    }
     
     // MARK: Calendar Helpers
     
@@ -717,45 +590,7 @@ final class TaskViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Change Password
-
-    /// Updates the authenticated user's
-    /// Firebase Authentication password.
-    
-
-    func changePassword(
-
-        currentPassword: String,
-
-        newPassword: String,
-
-        completion: @escaping (
-            Result<Void, Error>
-        ) -> Void
-    ) {
-
-        AuthService.shared
-            .reauthenticateAndChangePassword(
-
-                currentPassword: currentPassword,
-
-                newPassword: newPassword
-
-            ) { result in
-
-                DispatchQueue.main.async {
-
-                    completion(result)
-                }
-            }
-    }
-    
-    // MARK: Cleanup
-
-    deinit {
-
-        firestoreService.stopListening()
-    }
+   
     
 }
 

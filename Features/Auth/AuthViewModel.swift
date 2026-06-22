@@ -43,6 +43,7 @@ final class AuthViewModel: ObservableObject {
 
     /// Controls authentication loading state.
     @Published var isLoading = false
+    @Published var alertTitle = "Authentication"
 
     /// Controls error alert presentation.
     @Published var showError = false
@@ -52,18 +53,19 @@ final class AuthViewModel: ObservableObject {
     /// Indicates whether biometric
     /// authentication failed.
     @Published var isFingerprintFailed = false
+    
 
     /// Message displayed on the fingerprint screen.
     @Published var fingerprintMessage =
     "Please hold your finger on the fingerprint scanner to verify your identity"
 
+    
+    
     // MARK: Login
 
     /// Authenticates an existing user
     /// using Firebase Authentication.
-    ///
-    /// - Parameter completion:
-    /// Called when authentication succeeds.
+   
     func login(
         completion: @escaping () -> Void
     ) {
@@ -83,7 +85,11 @@ final class AuthViewModel: ObservableObject {
 
             DispatchQueue.main.async {
 
-                self?.isLoading = false
+                guard let self = self else {
+                    return
+                }
+
+                self.isLoading = false
 
                 switch result {
 
@@ -93,15 +99,119 @@ final class AuthViewModel: ObservableObject {
 
                 case .failure(let error):
 
-                    self?.errorMessage =
-                    error.localizedDescription
+                    self.alertTitle =
+                    "Login Failed"
 
-                    self?.showError = true
+                    let nsError = error as NSError
+
+                    switch nsError.code {
+
+                    case 17004, 17009:
+
+                        self.errorMessage =
+                        "Incorrect email or password."
+
+                    case 17011:
+
+                        self.errorMessage =
+                        "No account found with this email."
+
+                    case 17008:
+
+                        self.errorMessage =
+                        "Please enter a valid email address."
+
+                    case 17020:
+
+                        self.errorMessage =
+                        "No internet connection."
+
+                    default:
+
+                        self.errorMessage =
+                        "Unable to sign in. Please try again."
+                    }
+
+                    self.showError = true
                 }
             }
         }
     }
+    
+    // MARK: Google Sign In
+   /// Authenticates the user using
+    /// Google Sign-In and creates
+    /// a Firestore user document
+   
+    func signInWithGoogle(
+        completion: @escaping () -> Void
+    ) {
 
+        errorMessage = ""
+
+        isLoading = true
+
+        AuthService.shared
+            .signInWithGoogle {
+
+                [weak self] result in
+
+                guard let self else {
+                    return
+                }
+
+                DispatchQueue.main.async {
+
+                    switch result {
+
+                    case .success(let firebaseUser):
+
+                        let appUser = AppUser(
+
+                            id: firebaseUser.uid,
+
+                            displayName:
+                                firebaseUser.displayName
+                                ?? "Google User",
+
+                            email:
+                                firebaseUser.email
+                                ?? "",
+
+                            avatarURL:
+                                firebaseUser.photoURL?
+                                .absoluteString
+                                ?? "",
+
+                            createdAt: Date()
+                        )
+
+                        FirestoreService.shared
+                            .createUser(
+                                user: appUser
+                            ) { _ in
+
+                                DispatchQueue.main.async {
+
+                                    self.isLoading = false
+
+                                    completion()
+                                }
+                            }
+                    case .failure(let error):
+
+                        self.isLoading = false
+
+                        self.errorMessage =
+                        error.localizedDescription
+
+                        self.showError = true
+                    }
+                }
+            }
+    }
+    
+    
     // MARK: Registration
 
     /// Creates a new Firebase Authentication account
@@ -165,8 +275,39 @@ final class AuthViewModel: ObservableObject {
 
                         case .failure(let error):
 
-                            self.errorMessage =
-                            error.localizedDescription
+                            self.isLoading = false
+
+                            self.alertTitle = "Registration Failed"
+
+                            let nsError = error as NSError
+
+                            switch nsError.code {
+
+                            case 17007:
+
+                                self.errorMessage =
+                                "An account with this email already exists."
+
+                            case 17008:
+
+                                self.errorMessage =
+                                "Please enter a valid email address."
+
+                            case 17026:
+
+                                self.errorMessage =
+                                "Password must be at least 6 characters."
+
+                            case 17020:
+
+                                self.errorMessage =
+                                "No internet connection."
+
+                            default:
+
+                                self.errorMessage =
+                                "Unable to create account. Please try again."
+                            }
 
                             self.showError = true
                         }
@@ -192,6 +333,10 @@ final class AuthViewModel: ObservableObject {
 
     /// Sends a password reset email
     /// using Firebase Authentication.
+    // MARK: Password Reset
+
+    /// Sends a password reset email
+    /// using Firebase Authentication.
     func forgotPassword() {
 
         errorMessage = ""
@@ -199,6 +344,8 @@ final class AuthViewModel: ObservableObject {
         guard !email.trimmingCharacters(
             in: .whitespacesAndNewlines
         ).isEmpty else {
+
+            alertTitle = "Password Reset"
 
             errorMessage =
             "Please enter your email address."
@@ -209,6 +356,8 @@ final class AuthViewModel: ObservableObject {
         }
 
         guard isValidEmail(email) else {
+
+            alertTitle = "Password Reset"
 
             errorMessage =
             "Please enter a valid email address."
@@ -224,19 +373,51 @@ final class AuthViewModel: ObservableObject {
 
             DispatchQueue.main.async {
 
+                guard let self = self else {
+                    return
+                }
+
                 if let error {
 
-                    self?.errorMessage =
-                    error.localizedDescription
+                    self.alertTitle =
+                    "Password Reset Failed"
 
-                    self?.showError = true
+                    let nsError = error as NSError
+
+                    switch nsError.code {
+
+                    case 17011:
+
+                        self.errorMessage =
+                        "No account found with this email."
+
+                    case 17008:
+
+                        self.errorMessage =
+                        "Please enter a valid email address."
+
+                    case 17020:
+
+                        self.errorMessage =
+                        "No internet connection."
+
+                    default:
+
+                        self.errorMessage =
+                        "Unable to send reset email."
+                    }
+
+                    self.showError = true
 
                 } else {
 
-                    self?.errorMessage =
-                    "Password reset email sent successfully."
+                    self.alertTitle =
+                    "Password Reset"
 
-                    self?.showError = true
+                    self.errorMessage =
+                    "Check your email inbox for a password reset link."
+
+                    self.showError = true
                 }
             }
         }
@@ -245,9 +426,6 @@ final class AuthViewModel: ObservableObject {
     // MARK: Biometric Authentication
 
     /// Performs biometric verification.
-    ///
-    /// LocalAuthentication integration
-    /// will be implemented later.
     func verifyFingerprint(
         completion: @escaping () -> Void
     ) {

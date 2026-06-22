@@ -9,8 +9,6 @@ import SwiftUI
 
 // MARK: - AppTab
 
-/// Represents the available tabs within the
-/// main application dashboard.
 enum AppTab {
 
     case home
@@ -21,18 +19,15 @@ enum AppTab {
 
 // MARK: - MainTabView
 
-/// Main container view displayed after a user
-/// successfully authenticates.
-///
-/// Responsible for managing tab navigation,
-/// displaying the floating action button,
-/// and presenting the add task sheet.
 struct MainTabView: View {
 
     // MARK: Properties
 
     @ObservedObject
-    var viewModel: TaskViewModel
+    var taskViewModel: TaskViewModel
+
+    @ObservedObject
+    var profileViewModel: ProfileViewModel
 
     @State
     private var selectedTab: AppTab = .home
@@ -54,37 +49,30 @@ struct MainTabView: View {
 
                     switch selectedTab {
 
-                    // MARK: Home Tab
-
                     case .home:
 
                         HomeView(
-                            viewModel: viewModel,
+                            viewModel: taskViewModel,
                             onProfileTapped: {
                                 selectedTab = .profile
                             }
                         )
 
-                    // MARK: Calendar Tab
-
                     case .calendar:
 
                         CalendarView(
-                            viewModel: viewModel
+                            viewModel: taskViewModel
                         )
-
-                    // MARK: Focus Tab
 
                     case .focus:
 
                         FocusView()
 
-                    // MARK: Profile Tab
-
                     case .profile:
 
                         ProfileView(
-                            viewModel: viewModel
+                            profileViewModel: profileViewModel,
+                            taskViewModel: taskViewModel
                         )
                     }
                 }
@@ -140,7 +128,8 @@ struct MainTabView: View {
 
                 FABButton {
 
-                    viewModel.showAddTaskSheet = true
+                    taskViewModel.showAddTaskSheet = true
+
                 }
                 .offset(y: -32)
             }
@@ -149,11 +138,11 @@ struct MainTabView: View {
         // MARK: Add Task Sheet
 
         .sheet(
-            isPresented: $viewModel.showAddTaskSheet
+            isPresented: $taskViewModel.showAddTaskSheet
         ) {
 
             AddTaskView(
-                viewModel: viewModel
+                viewModel: taskViewModel
             )
             .presentationDetents([
                 .fraction(0.60)
@@ -165,8 +154,6 @@ struct MainTabView: View {
 
     // MARK: Tab Button
 
-    /// Creates a navigation button for the
-    /// custom bottom tab bar.
     @ViewBuilder
     private func tabButton(
         icon: String,
@@ -203,7 +190,8 @@ struct MainTabView: View {
 #Preview {
 
     MainTabView(
-        viewModel: TaskViewModel()
+        taskViewModel: TaskViewModel(),
+        profileViewModel: ProfileViewModel()
     )
     .preferredColorScheme(.dark)
 }

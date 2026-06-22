@@ -166,10 +166,12 @@ struct RegisterView: View {
                         assetIcon: "google_icon"
                     ) {
 
-                        // Google Sign-In will be
-                        // connected in a later step.
-                    }
+                        viewModel.signInWithGoogle {
 
+                            onRegisterSuccess()
+                        }
+                    }
+                    
                     Spacer()
                         .frame(height: 12)
 

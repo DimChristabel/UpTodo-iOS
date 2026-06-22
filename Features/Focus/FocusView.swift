@@ -18,8 +18,7 @@ struct FocusView: View {
     // MARK: Properties
 
     @StateObject
-    private var viewModel =
-    FocusViewModel()
+    private var viewModel = FocusViewModel()
 
     // MARK: Body
 
@@ -37,6 +36,19 @@ struct FocusView: View {
                 Text("Focus Mode")
                     .font(.title2)
                     .foregroundColor(.white)
+
+                // MARK: Session Type
+
+                Text(
+                    viewModel.sessionType == .work
+                    ? "Focus Session"
+                    : "Break Session"
+                )
+                .font(.headline)
+                .foregroundColor(
+                    Color("MildPurple")
+                )
+                .padding(.top, 8)
 
                 Spacer()
 
@@ -57,8 +69,7 @@ struct FocusView: View {
                         )
                         .stroke(
                             Color("MildPurple"),
-                            style:
-                            StrokeStyle(
+                            style: StrokeStyle(
                                 lineWidth: 12,
                                 lineCap: .round
                             )
@@ -77,6 +88,14 @@ struct FocusView: View {
                     width: 250,
                     height: 250
                 )
+
+                // MARK: Session Counter
+
+                Text(
+                    "Completed Sessions: \(viewModel.completedSessions)"
+                )
+                .foregroundColor(.gray)
+                .padding(.top, 20)
 
                 Spacer()
 
@@ -117,6 +136,23 @@ struct FocusView: View {
 
                 Spacer()
             }
+            .padding()
+        }
+
+        // MARK: Session Alert
+
+        .alert(
+            "Session Complete",
+            isPresented: $viewModel.showAlert
+        ) {
+
+            Button("OK") { }
+
+        } message: {
+
+            Text(
+                viewModel.alertMessage
+            )
         }
     }
 }

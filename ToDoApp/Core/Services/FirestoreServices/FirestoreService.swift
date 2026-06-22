@@ -6,8 +6,11 @@
 //
 
 import Foundation
+import UIKit
 import FirebaseFirestore
-
+import FirebaseAuth
+import FirebaseCore
+import GoogleSignIn
 
 // MARK: - FirestoreService
 
@@ -30,49 +33,79 @@ final class FirestoreService {
     private var taskListener: ListenerRegistration?
     
     // MARK: Create User
-    
-    /// Creates a user document in Firestore
-    /// immediately after Firebase Authentication
-    /// registration succeeds.
+
+    /// Creates a user document only if
+    /// one does not already exist.
     ///
     /// Path:
     /// users/{uid}
     func createUser(
         user: AppUser,
-        completion: @escaping (Result<Void, Error>) -> Void
+        completion: @escaping (
+            Result<Void, Error>
+        ) -> Void
     ) {
-        
-        do {
-            
-            try db
-                .collection("users")
-                .document(user.id)
-                .setData(
-                    from: user
-                ) { error in
-                    
-                    if let error {
-                        
-                        completion(
-                            .failure(error)
-                        )
-                        
-                    } else {
-                        
-                        completion(
-                            .success(())
-                        )
+
+        let documentRef = db
+            .collection("users")
+            .document(user.id)
+
+        documentRef.getDocument {
+
+            snapshot,
+            error in
+
+            if let error {
+
+                completion(
+                    .failure(error)
+                )
+
+                return
+            }
+
+            // MARK: User Already Exists
+
+            if snapshot?.exists == true {
+
+                completion(
+                    .success(())
+                )
+
+                return
+            }
+
+            // MARK: Create New User
+
+            do {
+
+                try documentRef
+                    .setData(
+                        from: user
+                    ) { error in
+
+                        if let error {
+
+                            completion(
+                                .failure(error)
+                            )
+
+                        } else {
+
+                            completion(
+                                .success(())
+                            )
+                        }
                     }
-                }
-            
-        } catch {
-            
-            completion(
-                .failure(error)
-            )
+
+            } catch {
+
+                completion(
+                    .failure(error)
+                )
+            }
         }
     }
-    
     
     // MARK: Task Operations
     
@@ -288,8 +321,5 @@ final class FirestoreService {
                 }
             }
     }
-    
-    
-    
     
 }

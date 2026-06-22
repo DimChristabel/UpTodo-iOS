@@ -172,8 +172,10 @@ struct LoginView: View {
                         assetIcon: "google_icon"
                     ) {
 
-                        // Google Sign-In
-                        // will be connected later.
+                        viewModel.signInWithGoogle {
+
+                            onLoginSuccess()
+                        }
                     }
 
                     // MARK: Apple Authentication
@@ -218,7 +220,7 @@ struct LoginView: View {
         // MARK: Error Alert
 
         .alert(
-            "Authentication Error",
+            viewModel.alertTitle,
             isPresented: $viewModel.showError
         ) {
 

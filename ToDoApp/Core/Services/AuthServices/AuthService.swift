@@ -6,7 +6,10 @@
 //
 
 import Foundation
+import UIKit
 import FirebaseAuth
+import FirebaseCore
+import GoogleSignIn
 
 // MARK: - AuthService
 
@@ -100,10 +103,6 @@ final class AuthService {
     
     /// Updates the authenticated user's
     /// Firebase Authentication password.
-    ///
-    /// - Parameters:
-    ///   - newPassword: The new password.
-    ///   - completion: Completion handler.
     func changePassword(
         
         newPassword: String,
@@ -137,42 +136,111 @@ final class AuthService {
                 )
             }
         }
-        
     }
- 
-    // MARK: - Reauthenticate & Change Password
-
+    
+    // MARK: Reauthenticate & Change Password
+    
     func reauthenticateAndChangePassword(
-
+        
         currentPassword: String,
-
+        
         newPassword: String,
-
+        
         completion: @escaping (
             Result<Void, Error>
         ) -> Void
     ) {
-
+        
         guard let user =
-            Auth.auth().currentUser,
-
+                Auth.auth().currentUser,
+              
               let email =
-            user.email
+                user.email
+        else {
+            
+            return
+        }
+        
+        let credential =
+        EmailAuthProvider.credential(
+            
+            withEmail: email,
+            
+            password: currentPassword
+        )
+        
+        user.reauthenticate(
+            with: credential
+        ) { _, error in
+            
+            if let error {
+                
+                completion(
+                    .failure(error)
+                )
+                
+                return
+            }
+            
+            user.updatePassword(
+                to: newPassword
+            ) { error in
+                
+                if let error {
+                    
+                    completion(
+                        .failure(error)
+                    )
+                    
+                } else {
+                    
+                    completion(
+                        .success(())
+                    )
+                }
+            }
+        }
+    }
+    
+    // MARK: Google Sign In
+    
+    /// Authenticates a user using Google Sign-In
+    /// and Firebase Authentication.
+    func signInWithGoogle(
+        completion: @escaping (
+            Result<User, Error>
+        ) -> Void
+    ) {
+
+        guard let clientID =
+            FirebaseApp.app()?.options.clientID
         else {
             return
         }
 
-        let credential =
-        EmailAuthProvider.credential(
-
-            withEmail: email,
-
-            password: currentPassword
+        let configuration =
+        GIDConfiguration(
+            clientID: clientID
         )
 
-        user.reauthenticate(
-            with: credential
-        ) { _, error in
+        guard let scene =
+            UIApplication.shared
+                .connectedScenes
+                .first as? UIWindowScene,
+
+              let rootViewController =
+            scene.windows.first?
+                .rootViewController
+        else {
+            return
+        }
+
+        GIDSignIn.sharedInstance.configuration =
+        configuration
+
+        GIDSignIn.sharedInstance.signIn(
+            withPresenting: rootViewController
+        ) { result, error in
 
             if let error {
 
@@ -183,9 +251,30 @@ final class AuthService {
                 return
             }
 
-            user.updatePassword(
-                to: newPassword
-            ) { error in
+            guard let googleUser =
+                result?.user,
+
+                  let idToken =
+                googleUser.idToken?
+                .tokenString
+            else {
+                return
+            }
+
+            let credential =
+            GoogleAuthProvider.credential(
+
+                withIDToken: idToken,
+
+                accessToken:
+                    googleUser
+                    .accessToken
+                    .tokenString
+            )
+
+            Auth.auth().signIn(
+                with: credential
+            ) { result, error in
 
                 if let error {
 
@@ -193,18 +282,20 @@ final class AuthService {
                         .failure(error)
                     )
 
-                } else {
-
-                    completion(
-                        .success(())
-                    )
+                    return
                 }
+
+                guard let user =
+                    result?.user
+                else {
+                    return
+                }
+
+                completion(
+                    .success(user)
+                )
             }
         }
     }
     
-    
-    
 }
-
-
