@@ -27,7 +27,7 @@ struct EmptyHomeView: View {
 
             // MARK: Empty State Illustration
 
-            Image("empty_state")
+            Image("emptyTask")
                 .resizable()
                 .scaledToFit()
                 .frame(
