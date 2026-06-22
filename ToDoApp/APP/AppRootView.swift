@@ -64,12 +64,6 @@ struct AppRootView: View {
 
                                 if sessionManager.isLoggedIn {
 
-                                    // Load User Profile
-                                    profileViewModel.loadCurrentUser()
-
-                                    // Load Firestore Tasks
-                                    taskViewModel.loadTasks()
-
                                     currentState = .dashboard
 
                                 } else {
@@ -143,26 +137,23 @@ struct AppRootView: View {
 
                         profileViewModel.loadCurrentUser()
                         taskViewModel.loadTasks()
-                        withAnimation(.easeInOut) {
 
-                            currentState = .fingerprint
-                        }
+                        currentState = .dashboard
+                    },
+
+                    onFingerprintTapped: {
+
+                        currentState = .fingerprint
                     },
 
                     onRegisterTapped: {
 
-                        withAnimation(.easeInOut) {
-
-                            currentState = .register
-                        }
+                        currentState = .register
                     },
 
                     onBack: {
 
-                        withAnimation(.easeInOut) {
-
-                            currentState = .welcome
-                        }
+                        currentState = .welcome
                     }
                 )
                 .transition(
@@ -180,11 +171,13 @@ struct AppRootView: View {
                     onRegisterSuccess: {
 
                         sessionManager.refreshSession()
+
                         profileViewModel.loadCurrentUser()
                         taskViewModel.loadTasks()
+
                         withAnimation(.easeInOut) {
 
-                            currentState = .fingerprint
+                            currentState = .dashboard
                         }
                     },
 
@@ -208,34 +201,30 @@ struct AppRootView: View {
                     .move(edge: .trailing)
                 )
 
-            // MARK: Fingerprint
+               
+                // MARK: Fingerprint
 
-            case .fingerprint:
+                case .fingerprint:
 
-                FingerprintView(
+                    FingerprintView(
 
-                    viewModel: authViewModel,
+                        viewModel: authViewModel,
 
-                    onAuthenticationPassed: {
+                        onAuthenticationPassed: {
 
-                        profileViewModel.loadCurrentUser()
-                        taskViewModel.loadTasks()
-
-                        withAnimation(.easeInOut) {
+                            profileViewModel.loadCurrentUser()
+                            taskViewModel.loadTasks()
 
                             currentState = .dashboard
+                        },
+
+                        onCancelDismiss: {
+
+                            currentState = .login
                         }
-                    },
-
-                    onCancelDismiss: {
-
-                        withAnimation(.easeInOut) {
-
-                            currentState = .welcome
-                        }
-                    }
-                )
-
+                    )
+                
+                
             // MARK: Dashboard
 
             case .dashboard:

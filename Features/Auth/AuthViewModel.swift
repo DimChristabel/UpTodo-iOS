@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import FirebaseAuth
 import FirebaseFirestore
+import LocalAuthentication
 
 // MARK: - AuthViewModel
 
@@ -424,15 +425,106 @@ final class AuthViewModel: ObservableObject {
     }
 
     // MARK: Biometric Authentication
+    /// Performs biometric verification.
+   
+    // MARK: Biometric Authentication
 
     /// Performs biometric verification.
+    /// Users can still continue using their
+    /// password if biometrics fail or are
+    /// unavailable.
     func verifyFingerprint(
         completion: @escaping () -> Void
     ) {
 
-        completion()
-    }
+        let context = LAContext()
 
+        var error: NSError?
+
+        guard context.canEvaluatePolicy(
+            .deviceOwnerAuthentication,
+            error: &error
+        ) else {
+
+            DispatchQueue.main.async {
+
+                self.fingerprintMessage =
+                "Biometric authentication is unavailable. You can continue using your password."
+
+                self.isFingerprintFailed = true
+            }
+
+            return
+        }
+
+        let reason =
+        "Authenticate to access UpTodo"
+
+        context.evaluatePolicy(
+            .deviceOwnerAuthentication,
+            localizedReason: reason
+        ) { success, error in
+
+            DispatchQueue.main.async {
+
+                if success {
+
+                    self.fingerprintMessage =
+                    "Authentication Successful"
+
+                    self.isFingerprintFailed = false
+
+                    completion()
+
+                } else {
+
+                    if let laError = error as? LAError {
+
+                        switch laError.code {
+
+                        case .userCancel:
+
+                            self.fingerprintMessage =
+                            "Authentication cancelled."
+
+                        case .userFallback:
+
+                            self.fingerprintMessage =
+                            "Use your password to continue."
+
+                        case .biometryNotAvailable:
+
+                            self.fingerprintMessage =
+                            "Biometric authentication is unavailable."
+
+                        case .biometryNotEnrolled:
+
+                            self.fingerprintMessage =
+                            "No Face ID or Touch ID is enrolled on this device."
+
+                        case .biometryLockout:
+
+                            self.fingerprintMessage =
+                            "Biometrics are temporarily locked. Use your device passcode."
+
+                        default:
+
+                            self.fingerprintMessage =
+                            "Authentication failed. You can continue using your password."
+                        }
+
+                    } else {
+
+                        self.fingerprintMessage =
+                        "Authentication failed. You can continue using your password."
+                    }
+
+                    self.isFingerprintFailed = true
+                }
+            }
+        }
+    }
+    
     // MARK: Validation
 
     /// Validates login credentials.

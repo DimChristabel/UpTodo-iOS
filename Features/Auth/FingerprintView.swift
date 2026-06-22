@@ -9,13 +9,11 @@ import SwiftUI
 
 // MARK: - FingerprintView
 
-/// Provides biometric authentication using
-/// Touch ID or device-supported fingerprint
-/// verification.
+/// Provides optional biometric authentication
+/// using Face ID, Touch ID, or device passcode.
 ///
-/// Users can authenticate using biometrics
-/// before accessing the main application or
-/// choose to return to the previous screen.
+/// Returning users can authenticate using
+/// biometrics or skip directly into the app.
 struct FingerprintView: View {
 
     // MARK: Properties
@@ -24,11 +22,11 @@ struct FingerprintView: View {
     var viewModel: AuthViewModel
 
     /// Called when biometric authentication
-    /// completes successfully.
+    /// succeeds.
     let onAuthenticationPassed: () -> Void
 
-    /// Called when the user cancels the
-    /// authentication process.
+    /// Called when the user skips
+    /// biometric authentication.
     let onCancelDismiss: () -> Void
 
     // MARK: Body
@@ -44,9 +42,9 @@ struct FingerprintView: View {
 
                 Spacer()
 
-                // MARK: Screen Title
+                // MARK: Title
 
-                Text("Fingerprint")
+                Text("Biometric Authentication")
                     .font(
                         .system(
                             size: 32,
@@ -54,10 +52,11 @@ struct FingerprintView: View {
                         )
                     )
                     .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
 
                 Spacer()
 
-                // MARK: Biometric Authentication
+                // MARK: Biometric Button
 
                 Button {
 
@@ -77,18 +76,28 @@ struct FingerprintView: View {
 
                 Spacer()
 
-                // MARK: Authentication Status
+                // MARK: Status Message
 
                 Text(
-                    viewModel.fingerprintMessage
+                    viewModel.fingerprintMessage.isEmpty
+                    ? "Use Face ID, Touch ID, or continue without biometrics."
+                    : viewModel.fingerprintMessage
                 )
-                .foregroundColor(.gray)
+                .foregroundColor(
+                    viewModel.isFingerprintFailed
+                    ? .red
+                    : .gray
+                )
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+
+                Spacer()
 
                 // MARK: Authentication Options
 
                 HStack {
+
+                    // Skip biometrics
 
                     Button("Cancel") {
 
@@ -96,6 +105,8 @@ struct FingerprintView: View {
                     }
 
                     Spacer()
+
+                    // Continue without biometrics
 
                     Button("Use Password") {
 

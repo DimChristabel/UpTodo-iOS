@@ -4,7 +4,6 @@
 //
 //  Created by Maxut Consulting on 31/05/2026.
 //
-
 import SwiftUI
 
 // MARK: - LoginView
@@ -17,6 +16,7 @@ import SwiftUI
 ///
 /// The screen also provides:
 /// - Password reset
+/// - Biometric Authentication
 /// - Google Sign-In
 /// - Apple Sign-In
 /// - Navigation to registration
@@ -27,15 +27,9 @@ struct LoginView: View {
     @ObservedObject
     var viewModel: AuthViewModel
 
-    /// Called when login completes successfully.
     let onLoginSuccess: () -> Void
-
-    /// Called when the user chooses to navigate
-    /// to the registration screen.
+    let onFingerprintTapped: () -> Void
     let onRegisterTapped: () -> Void
-
-    /// Called when the user returns to the
-    /// previous screen.
     let onBack: () -> Void
 
     // MARK: Body
@@ -54,7 +48,7 @@ struct LoginView: View {
                     spacing: 28
                 ) {
 
-                    // MARK: Back Navigation
+                    // MARK: Back Button
 
                     HStack {
 
@@ -73,7 +67,7 @@ struct LoginView: View {
                     }
                     .padding(.bottom, 30)
 
-                    // MARK: Screen Title
+                    // MARK: Title
 
                     Text("Login")
                         .font(
@@ -85,7 +79,7 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .padding(.bottom, 12)
 
-                    // MARK: Email Input
+                    // MARK: Email
 
                     AuthTextField(
                         title: "Email",
@@ -93,7 +87,7 @@ struct LoginView: View {
                         text: $viewModel.email
                     )
 
-                    // MARK: Password Input
+                    // MARK: Password
 
                     AuthSecureField(
                         title: "Password",
@@ -160,11 +154,44 @@ struct LoginView: View {
                         }
                     }
 
-                    // MARK: Authentication Divider
+                    // MARK: Divider
 
                     ORDivider()
 
-                    // MARK: Google Authentication
+                    // MARK: Fingerprint Authentication
+
+                    Button {
+
+                        onFingerprintTapped()
+
+                    }label: {
+
+                        HStack(spacing: 12) {
+
+                            Image(systemName: "touchid")
+                                .font(.title3)
+
+                            Text("Use Biometrics")
+                                .font(.headline)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(
+                            Color.black.opacity(0.15)
+                        )
+                        .overlay(
+                            RoundedRectangle(
+                                cornerRadius: 8
+                            )
+                            .stroke(
+                                Color.gray.opacity(0.4),
+                                lineWidth: 1
+                            )
+                        )
+                    }
+
+                    // MARK: Google Sign In
 
                     SocialAuthButton(
                         title: "Continue with Google",
@@ -178,7 +205,7 @@ struct LoginView: View {
                         }
                     }
 
-                    // MARK: Apple Authentication
+                    // MARK: Apple Sign In
 
                     SocialAuthButton(
                         title: "Continue with Apple",
@@ -187,13 +214,12 @@ struct LoginView: View {
                     ) {
 
                         // Apple Sign-In
-                        // will be connected later.
                     }
 
                     Spacer()
                         .frame(height: 12)
 
-                    // MARK: Registration Navigation
+                    // MARK: Register
 
                     HStack {
 
@@ -217,7 +243,7 @@ struct LoginView: View {
             }
         }
 
-        // MARK: Error Alert
+        // MARK: Alert
 
         .alert(
             viewModel.alertTitle,
@@ -243,6 +269,7 @@ struct LoginView: View {
     LoginView(
         viewModel: AuthViewModel(),
         onLoginSuccess: {},
+        onFingerprintTapped: {},
         onRegisterTapped: {},
         onBack: {}
     )
