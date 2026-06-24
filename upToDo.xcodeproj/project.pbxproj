@@ -73,6 +73,8 @@
 		6BC909492FE83B5000D0D1A3 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC909482FE83B5000D0D1A3 /* GoogleSignIn */; };
 		6BC9094B2FE83B5000D0D1A3 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6BC9094A2FE83B5000D0D1A3 /* GoogleSignInSwift */; };
 		6BC9095D2FE9481700D0D1A3 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC9095C2FE9481400D0D1A3 /* ProfileViewModel.swift */; };
+		6BC909892FEAC88D00D0D1A3 /* BiometricManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC909882FEAC88A00D0D1A3 /* BiometricManager.swift */; };
+		6BC9098B2FEAC9BC00D0D1A3 /* BiometricSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC9098A2FEAC9B900D0D1A3 /* BiometricSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -137,6 +139,8 @@
 		6BC909422FE547BA00D0D1A3 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		6BC909452FE82EC800D0D1A3 /* ProfileImageStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageStorageService.swift; sourceTree = "<group>"; };
 		6BC9095C2FE9481400D0D1A3 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		6BC909882FEAC88A00D0D1A3 /* BiometricManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricManager.swift; sourceTree = "<group>"; };
+		6BC9098A2FEAC9B900D0D1A3 /* BiometricSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -290,6 +294,7 @@
 			children = (
 				6BC9095C2FE9481400D0D1A3 /* ProfileViewModel.swift */,
 				6BBF4E592FD1643A00E4AD81 /* ProfileView.swift */,
+				6BC9098A2FEAC9B900D0D1A3 /* BiometricSettingsView.swift */,
 				6BC908F32FE1428300D0D1A3 /* AboutUsView.swift */,
 				6BC9091C2FE302DB00D0D1A3 /* HelpAndFeedbackView.swift */,
 				6BC908CC2FE08E4100D0D1A3 /* SettingsView.swift */,
@@ -465,6 +470,7 @@
 			isa = PBXGroup;
 			children = (
 				6BC909422FE547BA00D0D1A3 /* SessionManager.swift */,
+				6BC909882FEAC88A00D0D1A3 /* BiometricManager.swift */,
 				6BC9092B2FE5217E00D0D1A3 /* FirebaseManager.swift */,
 			);
 			path = Managers;
@@ -594,8 +600,10 @@
 				6BBF4E8C2FDAB27200E4AD81 /* HomeComponent.swift in Sources */,
 				6BC908FE2FE1449C00D0D1A3 /* EditTaskView.swift in Sources */,
 				6BC909302FE5380400D0D1A3 /* AuthService.swift in Sources */,
+				6BC909892FEAC88D00D0D1A3 /* BiometricManager.swift in Sources */,
 				6BC9091D2FE3030000D0D1A3 /* HelpAndFeedbackView.swift in Sources */,
 				6BC908E12FE0947200D0D1A3 /* MainTabView.swift in Sources */,
+				6BC9098B2FEAC9BC00D0D1A3 /* BiometricSettingsView.swift in Sources */,
 				6BC908D22FE0929000D0D1A3 /* OutlineButton.swift in Sources */,
 				6BC908DE2FE0937900D0D1A3 /* ORDivider..swift in Sources */,
 				6BC908E92FE09A5300D0D1A3 /* SocialButton.swift in Sources */,
@@ -761,6 +769,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 674GFKW84Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = upToDo/Info.plist;
@@ -793,6 +802,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 674GFKW84Z;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = upToDo/Info.plist;

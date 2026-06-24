@@ -37,6 +37,7 @@ struct ProfileView: View {
     @State private var showImageOptions = false
     @State private var showHelpAndFeedback = false
     @State private var showSupportUs = false
+    @State private var showBiometricSettings = false
     @State private var showLogoutConfirmation = false
 
     // MARK: Image Selection
@@ -191,6 +192,18 @@ struct ProfileView: View {
                             showImageOptions = true
                         }
                         
+                        
+                        // MARK: Biometric Authentication
+
+                        ProfileRowItem(
+                            icon: "touchid",
+                            title: "Activate Biometric"
+                        ) {
+
+                            showBiometricSettings = true
+                        }
+                        
+                        
                         // MARK: Application Information
                         
                         ProfileSectionLabel(
@@ -212,6 +225,8 @@ struct ProfileView: View {
                             
                             showFAQ = true
                         }
+                    
+                        
                         
                         // MARK: Logout
                         
@@ -340,6 +355,17 @@ struct ProfileView: View {
             
             SupportUsView()
         }
+        
+        // MARK: Biometric Settings Sheet
+
+        .sheet(
+            isPresented:
+            $showBiometricSettings
+        ) {
+
+            BiometricSettingsView()
+        }
+        
         
         // MARK: Image Picker Sheet
         

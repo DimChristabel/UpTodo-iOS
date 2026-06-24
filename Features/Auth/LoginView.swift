@@ -158,37 +158,41 @@ struct LoginView: View {
 
                     ORDivider()
 
-                    // MARK: Fingerprint Authentication
+                    
+                    // MARK: Biometric Authentication
 
-                    Button {
+                    if BiometricManager.shared.isEnabled {
 
-                        onFingerprintTapped()
+                        Button {
 
-                    }label: {
+                            onFingerprintTapped()
 
-                        HStack(spacing: 12) {
+                        } label: {
 
-                            Image(systemName: "touchid")
-                                .font(.title3)
+                            HStack(spacing: 12) {
 
-                            Text("Use Biometrics")
-                                .font(.headline)
+                                Image(systemName: "touchid")
+                                    .font(.title3)
+
+                                Text("Use Biometrics")
+                                    .font(.headline)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(
+                                Color.black.opacity(0.15)
+                            )
+                            .overlay(
+                                RoundedRectangle(
+                                    cornerRadius: 8
+                                )
+                                .stroke(
+                                    Color.gray.opacity(0.4),
+                                    lineWidth: 1
+                                )
+                            )
                         }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(
-                            Color.black.opacity(0.15)
-                        )
-                        .overlay(
-                            RoundedRectangle(
-                                cornerRadius: 8
-                            )
-                            .stroke(
-                                Color.gray.opacity(0.4),
-                                lineWidth: 1
-                            )
-                        )
                     }
 
                     // MARK: Google Sign In
